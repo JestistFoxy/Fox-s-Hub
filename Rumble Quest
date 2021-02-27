@@ -1,0 +1,138 @@
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local Heartbeat = game:GetService('RunService').Heartbeat
+local RemoteFunction = ReplicatedStorage.Modules.Network.RemoteFunction
+local RemoteEvent = ReplicatedStorage.Modules.Network.RemoteEvent
+
+local Player = game.Players.LocalPlayer
+
+local Level = Player.Level.Value
+
+local Bosses = {
+	['Frost Giant'] = true;
+	['Abaddon'] = true;
+	['Tomb Guardian'] = true;
+	['Jungle Guardian'] = true;
+	['King Orc'] = true
+}
+
+function PlayGame()
+    RemoteEvent:FireServer("StartDungeon")
+end
+
+function Damage(Humanoid)
+    local FindWeapon = Player.Character:FindFirstChildWhichIsA('Model')
+    
+    if FindWeapon then
+        RemoteEvent:FireServer("WeaponDamage", FindWeapon.Name, Humanoid)
+    end
+end
+
+local AttackEnemy = Instance.new('BindableEvent')
+
+AttackEnemy.Event:connect(function()
+    while Heartbeat:wait() do
+        for i,v in pairs(workspace.Enemies:GetChildren()) do
+            local Humanoid = v:FindFirstChildWhichIsA('Humanoid')
+            local Part = v:FindFirstChildWhichIsA('BasePart')
+            if Humanoid and Part then
+                if Humanoid.Health > 0 then
+                    if Player.Character then
+                        local FindPlayerHumanoid = Player.Character:FindFirstChildWhichIsA('Humanoid')
+                        if FindPlayerHumanoid then
+                            if FindPlayerHumanoid.Health > 0 then
+                                local InDistance = Player:DistanceFromCharacter(Part.Position) < 20
+                                
+                                if InDistance then
+                                    Damage(Humanoid)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+function FindBestDungeon()
+    local Dungeons = {
+    	[1] = {270, 'Expert', 'Jungle Temple'};
+    	[2] = {250, 'Hard', 'Jungle Temple'};
+    	[3] = {230, 'Medium', 'Jungle Temple'};
+    	[4] = {210, 'Easy', 'Jungle Temple'};
+    	[5] = {200, 'Expert', 'Ancient Tomb'};
+    	[6] = {180, 'Hard', 'Ancient Tomb'};
+    	[7] = {160, 'Medium', 'Ancient Tomb'};
+    	[8] = {140, 'Easy', 'Ancient Tomb'};
+    	[9] = {140, 'Expert', 'Frozen Depths'};
+    	[10] = {120, 'Hard', 'Frozen Depths'};
+    	[11] = {100, 'Medium', 'Frozen Depths'};
+    	[12] = {80, 'Easy', 'Frozen Depths'};
+    	[13] = {60, 'Expert', 'Underworld'};
+    	[14] = {50, 'Hard', 'Underworld'};
+    	[15] = {40, 'Medium', 'Underworld'};
+    	[16] = {30, 'Easy', 'Underworld'};
+    	[17] = {20, 'Expert', 'Caves'};
+    	[18] = {12, 'Hard', 'Caves'};
+    	[19] = {6, 'Medium', 'Caves'};
+    	[20] = {1, 'Easy', 'Caves'};
+    }
+    
+    for i = 1, #Dungeons do
+        if Level >= Dungeons[i][1] then
+            return Dungeons[i][3], Dungeons[i][2]
+        end
+    end
+end
+
+function CreateLobby()
+    local Dungeon, Difficulty = FindBestDungeon()
+    
+    if Dungeon and Difficulty then
+        local args = {
+            [1] = "CreateLobby",
+            [2] = {
+                ["Difficulty"] = Difficulty,
+                ["PartyOnly"] = true,
+                ["Hardcore"] = true,
+                ["Location"] = Dungeon
+            }
+        }
+        
+        RemoteFunction:InvokeServer(unpack(args))
+        
+        PlayGame()
+    end
+end
+
+if #game.Players:GetPlayers() > 1 then
+    if _G.AutoRestartDungeon then
+      CreateLobby()
+    end
+else
+    AttackEnemy:Fire()
+    if _G.TeleportKill then
+        while Heartbeat:wait() do
+            for i,v in pairs(workspace.Enemies:GetChildren()) do
+                local Humanoid = v:FindFirstChildWhichIsA('Humanoid')
+                local Part = v:FindFirstChildWhichIsA('BasePart')
+                if Humanoid and Part then
+                    if Humanoid.Health > 0 then
+                        if Player.Character then
+                            local FindPlayerHumanoid = Player.Character:FindFirstChildWhichIsA('Humanoid')
+                            if FindPlayerHumanoid then
+                                if FindPlayerHumanoid.Health > 0 then
+                                    if not Bosses[v.Name] then
+                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,10,0))
+                                    else
+                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,0,10))
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
