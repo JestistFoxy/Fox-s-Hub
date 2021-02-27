@@ -1,4 +1,4 @@
-print('Loading Hack')
+print('Loading Hack v2')
 wait(3)
 
 _G.AutoRestartDungeon = true
