@@ -139,4 +139,8 @@ else
     end
 end
 
-syn.queue_on_teleport("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest")
+Player.OnTeleport:connect(function(State)
+    if State == Enum.TeleportState.Started then
+        syn.queue_on_teleport("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest")
+    end
+end)
