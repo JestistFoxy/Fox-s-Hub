@@ -1,5 +1,4 @@
-print('Loading Hack v3')
-wait(3)
+print('Loading Hack v4')
 
 syn.queue_on_teleport([[
     loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
@@ -10,10 +9,11 @@ _G.TeleportKill = true
 
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local Heartbeat = game:GetService('RunService').Heartbeat
-local RemoteFunction = ReplicatedStorage.Modules.Network.RemoteFunction
-local RemoteEvent = ReplicatedStorage.Modules.Network.RemoteEvent
+local RemoteFunction = ReplicatedStorage:WaitForChikd('Modules').Network.RemoteFunction
+local RemoteEvent = ReplicatedStorage:WaitForChikd('Modules').Network.RemoteEvent
 
 local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:wait()
 
 local Level = Player.Level.Value
 
