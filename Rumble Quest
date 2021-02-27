@@ -1,4 +1,4 @@
-print('Loading Hack v5')
+print('Loading Hack v6')
 
 syn.queue_on_teleport([[
     loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
@@ -14,6 +14,8 @@ local RemoteEvent = ReplicatedStorage:WaitForChild('Modules').Network.RemoteEven
 
 local Player = game.Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:wait()
+
+wait(3)
 
 local Level = Player.Level.Value
 
