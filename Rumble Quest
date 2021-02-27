@@ -9,8 +9,8 @@ _G.TeleportKill = true
 
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local Heartbeat = game:GetService('RunService').Heartbeat
-local RemoteFunction = ReplicatedStorage:WaitForChikd('Modules').Network.RemoteFunction
-local RemoteEvent = ReplicatedStorage:WaitForChikd('Modules').Network.RemoteEvent
+local RemoteFunction = ReplicatedStorage:WaitForChild('Modules').Network.RemoteFunction
+local RemoteEvent = ReplicatedStorage:WaitForChild('Modules').Network.RemoteEvent
 
 local Player = game.Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:wait()
