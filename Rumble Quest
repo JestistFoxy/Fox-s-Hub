@@ -1,5 +1,9 @@
-print('Loading Hack v2')
+print('Loading Hack v3')
 wait(3)
+
+syn.queue_on_teleport([[
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
+]])
 
 _G.AutoRestartDungeon = true
 _G.TeleportKill = true
@@ -142,7 +146,3 @@ else
         end
     end
 end
-
-syn.queue_on_teleport([[
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
-]])
