@@ -1,4 +1,4 @@
-print('Loading Hack v16')
+print('Loading Hack v17')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
@@ -135,7 +135,13 @@ end)
 function CheckBackpack()
 	local LoadModule = require(ReplicatedStorage:WaitForChild('LoadModule'))
 
-	local LocalData = LoadModule('GetLocalData')()
+	local LocalData
+	
+	while not LocalData and wait() do
+		pcall(function()
+			LocalData = LoadModule('GetLocalData')()
+		end)
+	end
 
 	local ArmorModule = require(ReplicatedStorage:WaitForChild('Modules'):WaitForChild('ItemData'):WaitForChild('Armors'))
 	local WeaponsModules = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Weapons')
@@ -151,7 +157,7 @@ function CheckBackpack()
 	local EquippedArmorHead = LocalData.EquippedArmorHead
 	local EquippedArmorBody = LocalData.EquippedArmorBody
 	local EquippedArmorLegs = LocalData.EquippedArmorLegs
-	
+
 	local AvaliableWeaponsTable = {}
 
 	local SellTable = {}
@@ -159,7 +165,7 @@ function CheckBackpack()
 	local function SellItems()
 		RemoteFunction:InvokeServer("SellItems", SellTable) 
 	end
-	
+
 	for i,v in pairs(Weapons) do
 		local ItemName = v[2]
 
@@ -346,7 +352,7 @@ if GameType.Value == 'Lobby' then
 	CreateLobby()
 else
 	repeat wait() until DungeonStarted.Value
-	
+
 	AttackEnemy:Fire()
 	while Heartbeat:wait() do
 		for i,v in pairs(workspace.Enemies:GetChildren()) do
