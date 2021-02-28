@@ -1,4 +1,4 @@
-print('Loading Hack v13')
+print('Loading Hack v14')
 
 _G.AutoRestartDungeon = true
 _G.TeleportKill = true
@@ -153,7 +153,7 @@ else
                                         Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,15,0))
                                     else
 				                        OnBoss:Fire(Humanoid)
-                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,5,8))
+                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,5,15))
                                     end
                                 end
                             end
