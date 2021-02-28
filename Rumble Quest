@@ -1,4 +1,4 @@
-print('Loading Hack v18')
+print('Loading Hack v19')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
@@ -177,7 +177,7 @@ function CheckBackpack()
 			local DamageType, AttackType = FindModule.DamageType, FindModule.AttackType
 
 			if DamageType == AttackType and DamageType == 'Melee' then
-				If FindModule.Level <= Level then
+				if FindModule.Level <= Level then
 					table.insert(AvaliableWeaponsTable, {v[1], v[2], FindModule, v[3]})
 				end
 			elseif FindModule.Rarity ~= 'Legendary' then
