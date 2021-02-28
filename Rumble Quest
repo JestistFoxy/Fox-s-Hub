@@ -1,4 +1,4 @@
-print('Loading Hack v19')
+print('Loading Hack v20')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
@@ -131,6 +131,24 @@ OnBoss.Event:connect(function(Boss)
 		TeleportService:Teleport(4390380541, Player)
 	end
 end)
+
+function UpgradeEquippedItem(Items)
+    local Stop = false
+    for i = 1, 25 do
+        for _,Info in pairs(Items) do
+            local Id = Info[1]
+            local Type = Info[2]
+            
+            if not RemoteFunction:InvokeServer("UpgradeItem", Type, Id) then
+                Stop = true
+                break
+            end
+        end
+        if Stop then
+            break
+        end
+    end
+end
 
 function CheckBackpack()
 	local LoadModule = require(ReplicatedStorage:WaitForChild('LoadModule'))
@@ -267,6 +285,8 @@ function CheckBackpack()
 			end
 		end
 	end
+	
+	local NeedsUpgrades = {}
 
 	local function Equip(Id, Hand)
 		RemoteEvent:FireServer('EquipWeapon', Id, Hand)
@@ -277,10 +297,12 @@ function CheckBackpack()
 			if EquippedWeaponRight ~= v then
 				Equip(v, 'Right')
 			end
+			table.insert(NeedsUpgrades, {v, 'Weapon'})
 		else
 			if EquippedWeaponLeft ~= v then
 				Equip(v, 'Left')
 			end
+			table.insert(NeedsUpgrades, {v, 'Weapon'})
 		end
 	end
 
@@ -330,23 +352,31 @@ function CheckBackpack()
 		if EquippedArmorLegs ~= Pieces.Legs[1] then
 			EquipArmor(Pieces.Legs[1])
 		end
+		
+		table.insert(NeedsUpgrades, {Pieces.Legs[1], 'Armor'})
 	end
 
 	if Pieces.Body[1] ~= 0 then
 		if EquippedArmorBody ~= Pieces.Body[1] then
 			EquipArmor(Pieces.Body[1])
 		end
+		
+		table.insert(NeedsUpgrades, {Pieces.Body[1], 'Armor'})
 	end
 
 	if Pieces.Head[1] ~= 0 then
 		if EquippedArmorHead ~= Pieces.Head[1] then
 			EquipArmor(Pieces.Head[1])
 		end
+		
+		table.insert(NeedsUpgrades, {Pieces.Head[1], 'Armor'})
 	end
 
 	if #SellTable > 0 then
 		SellItems()
 	end
+	
+	UpgradeEquippedItem(NeedsUpgrades)
 end
 
 if GameType.Value == 'Lobby' then
