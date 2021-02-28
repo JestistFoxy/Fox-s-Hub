@@ -1,4 +1,4 @@
-print('Loading Hack v20')
+print('Loading Hack v21')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
@@ -377,6 +377,8 @@ function CheckBackpack()
 	end
 	
 	UpgradeEquippedItem(NeedsUpgrades)
+	
+	RemoteEvent:FireServer('IncreaseSkill', 'Strength')
 end
 
 if GameType.Value == 'Lobby' then
