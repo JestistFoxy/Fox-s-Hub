@@ -1,4 +1,4 @@
-print('Loading Hack v12')
+print('Loading Hack v13')
 
 _G.AutoRestartDungeon = true
 _G.TeleportKill = true
@@ -150,7 +150,7 @@ else
                             if FindPlayerHumanoid then
                                 if FindPlayerHumanoid.Health > 0 then
                                     if not Bosses[v.Name] then
-                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,10,0))
+                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,15,0))
                                     else
 				                        OnBoss:Fire(Humanoid)
                                         Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,5,8))
