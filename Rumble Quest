@@ -123,6 +123,7 @@ OnBoss.Event:connect(function(Boss)
         Running = true
     	while Boss.Health > 0 and wait() do end
     	wait(.5)
+	print(1)
     	CreateLobby()
     end
 end)
