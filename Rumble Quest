@@ -1,4 +1,4 @@
-print('Loading Hack v15')
+print('Loading Hack v16')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
@@ -12,25 +12,6 @@ local TeleportService = game:GetService('TeleportService')
 local Heartbeat = game:GetService('RunService').Heartbeat
 local RemoteFunction = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Network'):WaitForChild('RemoteFunction')
 local RemoteEvent = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Network'):WaitForChild('RemoteEvent')
-
-local LoadModule = require(ReplicatedStorage:WaitForChild('LoadModule'))
-
-local LocalData = LoadModule('GetLocalData')()
-
-local ArmorModule = require(ReplicatedStorage:WaitForChild('Modules'):WaitForChild('ItemData'):WaitForChild('Armors'))
-local WeaponsModules = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Weapons')
-
-local Weapons = LocalData.Weapons
-local Abilities = LocalData.Abilities
-local Armors = LocalData.Armors
-
-local EquippedWeaponLeft = LocalData.EquippedWeaponLeft
-local EquippedWeaponRight = LocalData.EquippedWeaponRight
-local EquippedAbility1 = LocalData.EquippedAbility1
-local EquippedAbility2 = LocalData.EquippedAbility2
-local EquippedArmorHead = LocalData.EquippedArmorHead
-local EquippedArmorBody = LocalData.EquippedArmorBody
-local EquippedArmorLegs = LocalData.EquippedArmorLegs
 
 local GameType = ReplicatedStorage:WaitForChild('GameType')
 local DungeonStarted = ReplicatedStorage:WaitForChild('DungeonStarted')
@@ -152,6 +133,25 @@ OnBoss.Event:connect(function(Boss)
 end)
 
 function CheckBackpack()
+	local LoadModule = require(ReplicatedStorage:WaitForChild('LoadModule'))
+
+	local LocalData = LoadModule('GetLocalData')()
+
+	local ArmorModule = require(ReplicatedStorage:WaitForChild('Modules'):WaitForChild('ItemData'):WaitForChild('Armors'))
+	local WeaponsModules = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Weapons')
+
+	local Weapons = LocalData.Weapons
+	local Abilities = LocalData.Abilities
+	local Armors = LocalData.Armors
+
+	local EquippedWeaponLeft = LocalData.EquippedWeaponLeft
+	local EquippedWeaponRight = LocalData.EquippedWeaponRight
+	local EquippedAbility1 = LocalData.EquippedAbility1
+	local EquippedAbility2 = LocalData.EquippedAbility2
+	local EquippedArmorHead = LocalData.EquippedArmorHead
+	local EquippedArmorBody = LocalData.EquippedArmorBody
+	local EquippedArmorLegs = LocalData.EquippedArmorLegs
+	
 	local AvaliableWeaponsTable = {}
 
 	local SellTable = {}
