@@ -26,7 +26,7 @@ local Bosses = {
 	['Frost Giant'] = true;
 	['Abaddon'] = true;
 	['Temple Guardian'] = true;
-	['Jungle Guardian'] = true;
+	['Temple Golem'] = true;
 	['King Orc'] = true
 }
 
