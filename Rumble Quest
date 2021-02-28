@@ -147,6 +147,7 @@ else
                                     if not Bosses[v.Name] then
                                         Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,10,0))
                                     else
+				        OnBoss:Fire(Humanoid)
                                         Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,5,8))
                                     end
                                 end
