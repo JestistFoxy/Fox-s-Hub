@@ -25,7 +25,7 @@ local Level = Player.Level.Value
 local Bosses = {
 	['Frost Giant'] = true;
 	['Abaddon'] = true;
-	['Tomb Guardian'] = true;
+	['Temple Guardian'] = true;
 	['Jungle Guardian'] = true;
 	['King Orc'] = true
 }
