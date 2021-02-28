@@ -1,4 +1,4 @@
-print('Loading Hack v8')
+print('Loading Hack v9')
 
 syn.queue_on_teleport([[
     loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
@@ -38,6 +38,7 @@ function Damage(Humanoid)
 end
 
 local AttackEnemy = Instance.new('BindableEvent')
+local OnBoss = Instance.new('BindableEvent')
 
 AttackEnemy.Event:connect(function()
     while Heartbeat:wait() do
@@ -114,6 +115,17 @@ function CreateLobby()
         PlayGame()
     end
 end
+
+local Running = false
+
+OnBoss.Event:connect(function(Boss)
+    if not Running then
+        Running = true
+	while Boss.Health > 0 and wait() end
+	wait(.5)
+	CreateLobby()
+    end
+end)
 
 if #game.Players:GetPlayers() > 1 then
     if _G.AutoRestartDungeon then
