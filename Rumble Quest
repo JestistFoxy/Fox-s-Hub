@@ -1,4 +1,4 @@
-print('Loading Hack v21')
+print('Loading Hack v22')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
@@ -130,6 +130,15 @@ OnBoss.Event:connect(function(Boss)
 		wait(.5)
 		TeleportService:Teleport(4390380541, Player)
 	end
+end)
+
+TeleportService.TeleportInitFailed:connect(function()
+    if GameType.Value == 'Lobby' then
+        CheckBackpack()
+        CreateLobby()
+    else
+        TeleportService:Teleport(4390380541, Player)
+    end
 end)
 
 function UpgradeEquippedItem(Items)
