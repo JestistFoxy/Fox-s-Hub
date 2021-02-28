@@ -1,10 +1,7 @@
-print('Loading Hack v14')
-
-_G.AutoRestartDungeon = true
-_G.TeleportKill = true
+print('Loading Hack v15')
 
 if not _G['NotSynapse'] then
-    syn.queue_on_teleport([[
+	syn.queue_on_teleport([[
         loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
     ]])
 end
@@ -16,7 +13,30 @@ local Heartbeat = game:GetService('RunService').Heartbeat
 local RemoteFunction = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Network'):WaitForChild('RemoteFunction')
 local RemoteEvent = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Network'):WaitForChild('RemoteEvent')
 
+local LoadModule = require(ReplicatedStorage:WaitForChild('LoadModule'))
+
+local LocalData = LoadModule('GetLocalData')()
+
+local ArmorModule = require(ReplicatedStorage:WaitForChild('Modules'):WaitForChild('ItemData'):WaitForChild('Armors'))
+local WeaponsModules = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Weapons')
+
+local Weapons = LocalData.Weapons
+local Abilities = LocalData.Abilities
+local Armors = LocalData.Armors
+
+local EquippedWeaponLeft = LocalData.EquippedWeaponLeft
+local EquippedWeaponRight = LocalData.EquippedWeaponRight
+local EquippedAbility1 = LocalData.EquippedAbility1
+local EquippedAbility2 = LocalData.EquippedAbility2
+local EquippedArmorHead = LocalData.EquippedArmorHead
+local EquippedArmorBody = LocalData.EquippedArmorBody
+local EquippedArmorLegs = LocalData.EquippedArmorLegs
+
+local GameType = ReplicatedStorage:WaitForChild('GameType')
+local DungeonStarted = ReplicatedStorage:WaitForChild('DungeonStarted')
+
 local Player = game.Players.LocalPlayer
+
 local Character = Player.Character or Player.CharacterAdded:wait()
 
 local Level = Player.Level.Value
@@ -30,137 +50,325 @@ local Bosses = {
 }
 
 function PlayGame()
-    RemoteEvent:FireServer("StartDungeon")
+	RemoteEvent:FireServer("StartDungeon")
 end
 
 function Damage(Humanoid)
-    local FindWeapon = Player.Character:FindFirstChildWhichIsA('Model')
-    
-    if FindWeapon then
-        RemoteEvent:FireServer("WeaponDamage", FindWeapon.Name, Humanoid)
-    end
+	local FindWeapon = Player.Character:FindFirstChildWhichIsA('Model')
+
+	if FindWeapon then
+		RemoteEvent:FireServer("WeaponDamage", FindWeapon.Name, Humanoid)
+	end
 end
 
 local AttackEnemy = Instance.new('BindableEvent')
 local OnBoss = Instance.new('BindableEvent')
 
 AttackEnemy.Event:connect(function()
-    while Heartbeat:wait() do
-        for i,v in pairs(workspace.Enemies:GetChildren()) do
-            local Humanoid = v:FindFirstChildWhichIsA('Humanoid')
-            local Part = v:FindFirstChildWhichIsA('BasePart')
-            if Humanoid and Part then
-                if Humanoid.Health > 0 then
-                    if Player.Character then
-                        local FindPlayerHumanoid = Player.Character:FindFirstChildWhichIsA('Humanoid')
-                        if FindPlayerHumanoid then
-                            if FindPlayerHumanoid.Health > 0 then
-                                local InDistance = Player:DistanceFromCharacter(Part.Position) < 20
-                                
-                                if InDistance then
-                                    Damage(Humanoid)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
+	while Heartbeat:wait() do
+		for i,v in pairs(workspace.Enemies:GetChildren()) do
+			local Humanoid = v:FindFirstChildWhichIsA('Humanoid')
+			local Part = v:FindFirstChildWhichIsA('BasePart')
+			if Humanoid and Part then
+				if Humanoid.Health > 0 then
+					if Player.Character then
+						local FindPlayerHumanoid = Player.Character:FindFirstChildWhichIsA('Humanoid')
+						if FindPlayerHumanoid then
+							if FindPlayerHumanoid.Health > 0 then
+								local InDistance = Player:DistanceFromCharacter(Part.Position) < 20
+
+								if InDistance then
+									Damage(Humanoid)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 end)
 
 function FindBestDungeon()
-    local Dungeons = {
-    	[1] = {270, 'Expert', 'Jungle Temple'};
-    	[2] = {250, 'Hard', 'Jungle Temple'};
-    	[3] = {230, 'Medium', 'Jungle Temple'};
-    	[4] = {210, 'Easy', 'Jungle Temple'};
-    	[5] = {200, 'Expert', 'Ancient Tomb'};
-    	[6] = {180, 'Hard', 'Ancient Tomb'};
-    	[7] = {160, 'Medium', 'Ancient Tomb'};
-    	[8] = {140, 'Easy', 'Ancient Tomb'};
-    	[9] = {140, 'Expert', 'Frozen Depths'};
-    	[10] = {120, 'Hard', 'Frozen Depths'};
-    	[11] = {100, 'Medium', 'Frozen Depths'};
-    	[12] = {80, 'Easy', 'Frozen Depths'};
-    	[13] = {60, 'Expert', 'Underworld'};
-    	[14] = {50, 'Hard', 'Underworld'};
-    	[15] = {40, 'Medium', 'Underworld'};
-    	[16] = {30, 'Easy', 'Underworld'};
-    	[17] = {20, 'Expert', 'Caves'};
-    	[18] = {12, 'Hard', 'Caves'};
-    	[19] = {6, 'Medium', 'Caves'};
-    	[20] = {1, 'Easy', 'Caves'};
-    }
-    
-    for i = 1, #Dungeons do
-        if Level >= Dungeons[i][1] then
-            return Dungeons[i][3], Dungeons[i][2]
-        end
-    end
+	local Dungeons = {
+		[1] = {270, 'Expert', 'Jungle Temple'};
+		[2] = {250, 'Hard', 'Jungle Temple'};
+		[3] = {230, 'Medium', 'Jungle Temple'};
+		[4] = {210, 'Easy', 'Jungle Temple'};
+		[5] = {200, 'Expert', 'Ancient Tomb'};
+		[6] = {180, 'Hard', 'Ancient Tomb'};
+		[7] = {160, 'Medium', 'Ancient Tomb'};
+		[8] = {140, 'Easy', 'Ancient Tomb'};
+		[9] = {140, 'Expert', 'Frozen Depths'};
+		[10] = {120, 'Hard', 'Frozen Depths'};
+		[11] = {100, 'Medium', 'Frozen Depths'};
+		[12] = {80, 'Easy', 'Frozen Depths'};
+		[13] = {60, 'Expert', 'Underworld'};
+		[14] = {50, 'Hard', 'Underworld'};
+		[15] = {40, 'Medium', 'Underworld'};
+		[16] = {30, 'Easy', 'Underworld'};
+		[17] = {20, 'Expert', 'Caves'};
+		[18] = {12, 'Hard', 'Caves'};
+		[19] = {6, 'Medium', 'Caves'};
+		[20] = {1, 'Easy', 'Caves'};
+	}
+
+	for i = 1, #Dungeons do
+		if Level >= Dungeons[i][1] then
+			return Dungeons[i][3], Dungeons[i][2]
+		end
+	end
 end
 
 function CreateLobby()
-    local Dungeon, Difficulty = FindBestDungeon()
-    
-    if Dungeon and Difficulty then
-        local args = {
-            [1] = "CreateLobby",
-            [2] = {
-                ["Difficulty"] = Difficulty,
-                ["PartyOnly"] = true,
-                ["Hardcore"] = true,
-                ["Location"] = Dungeon
-            }
-        }
-        
-        RemoteFunction:InvokeServer(unpack(args))
-        
-        PlayGame()
-    end
+	local Dungeon, Difficulty = FindBestDungeon()
+
+	if Dungeon and Difficulty then
+		local args = {
+			[1] = "CreateLobby",
+			[2] = {
+				["Difficulty"] = Difficulty,
+				["PartyOnly"] = true,
+				["Hardcore"] = true,
+				["Location"] = Dungeon
+			}
+		}
+
+		RemoteFunction:InvokeServer(unpack(args))
+
+		PlayGame()
+	end
 end
 
 local Running = false
 
 OnBoss.Event:connect(function(Boss)
-    if not Running then
-        Running = true
-    	while Boss.Health > 0 and wait() do end
-    	print('Teleporting Back')
-    	wait(.5)
-    	TeleportService:Teleport(4390380541, Player)
-    end
+	if not Running then
+		Running = true
+		while Boss.Health > 0 and wait() do end
+		wait(.5)
+		TeleportService:Teleport(4390380541, Player)
+	end
 end)
 
-if #game.Players:GetPlayers() > 1 then
-    if _G.AutoRestartDungeon then
-      CreateLobby()
-    end
+function CheckBackpack()
+	local AvaliableWeaponsTable = {}
+
+	local SellTable = {}
+
+	local function SellItems()
+		RemoteFunction:InvokeServer("SellItems", SellTable) 
+	end
+	
+	for i,v in pairs(Weapons) do
+		local ItemName = v[2]
+
+		local FindModule = WeaponsModules:FindFirstChild(ItemName)
+
+		if FindModule then
+			FindModule = require(FindModule)
+
+			local DamageType, AttackType = FindModule.DamageType, FindModule.AttackType
+
+			if DamageType == AttackType and DamageType == 'Melee' then
+				table.insert(AvaliableWeaponsTable, {v[1], v[2], FindModule, v[3]})
+			elseif FindModule.Rarity ~= 'Legendary' then
+				table.insert(SellTable, {"Weapon", v[1]})
+			end
+		end
+	end
+
+	local BestWeapon = {0,0}
+
+	for i,v in pairs(AvaliableWeaponsTable) do
+		local Id = v[1]
+		local ItemName = v[2]
+		local Info = v[3]
+		local Upgrades = v[4]
+		local Damage = Info['Damage']
+		local Rarity = Info['Rarity']
+		local Hands = Info.Hands
+
+		if BestWeapon[2] < Damage then
+			if BestWeapon[1] ~= 0 then
+				if BestWeapon[5] ~= 'Legendary' then
+					table.insert(SellTable, {"Weapon", BestWeapon[1]})
+				end
+			end
+			BestWeapon = {Id, Damage, v, Hands, Rarity, Upgrades}
+		elseif Damage ~= BestWeapon[2] then
+			if Rarity ~= 'Legendary' then
+				table.insert(SellTable, {"Weapon", Id})
+			end
+		elseif Upgrades > BestWeapon[6] then
+			if BestWeapon[5] ~= 'Legendary' then
+				table.insert(SellTable, {"Weapon", Id})
+			end
+			BestWeapon = {Id, Damage, v, Hands, Rarity, Upgrades}
+		else
+			if Rarity ~= 'Legendary' then
+				table.insert(SellTable, {"Weapon", Id})
+			end
+		end
+	end
+
+	local Swords = {}
+
+	if BestWeapon[1] ~= 0 then
+		local Id = BestWeapon[1]
+		local Damage = BestWeapon[2]
+		local Info = BestWeapon[3]
+		local Hands = BestWeapon[4]
+
+		table.insert(Swords, Id)
+
+		if Hands == 1 then
+			local NextBest = {0, 0}
+
+			for i,v in pairs(AvaliableWeaponsTable) do
+				local NextBestId = v[1]
+				local NextBestItemName = v[2]
+				local NextBestInfo = v[3]
+				local NextBestUpgrade = v[4]
+				local NextBestDamage = NextBestInfo['Damage']
+				local NextBestRarity = NextBestInfo['Rarity']
+				local NextBestHands = NextBestInfo.Hands
+
+				if NextBestHands == 1 then
+					if NextBestId ~= Id then
+						if NextBest[2] < NextBestDamage then
+							NextBest = {NextBestId, NextBestDamage, v, NextBestHands, NextBestRarity, NextBestUpgrade}
+						elseif NextBest[2] == NextBestDamage then
+							if NextBest[6] < NextBestUpgrade then
+								NextBest = {NextBestId, NextBestDamage, v, NextBestHands, NextBestRarity, NextBestUpgrade}
+							end
+						end
+					end
+				end
+			end
+
+			if NextBest[3] then
+				for i,v in pairs(SellTable) do
+					if v[2] == NextBest[3][1] then
+						table.remove(SellTable, i)
+						break
+					end
+				end
+
+				table.insert(Swords, NextBest[3][1])
+			end
+		end
+	end
+
+	local function Equip(Id, Hand)
+		RemoteEvent:FireServer('EquipWeapon', Id, Hand)
+	end
+
+	for i,v in pairs(Swords) do
+		if i == 1 then
+			if EquippedWeaponRight ~= v then
+				Equip(v, 'Right')
+			end
+		else
+			if EquippedWeaponLeft ~= v then
+				Equip(v, 'Left')
+			end
+		end
+	end
+
+	for i,v in pairs(Abilities) do
+		if v[1] ~= EquippedAbility1 and v[1] ~= EquippedAbility2 then
+			table.insert(SellTable, {"Ability", v[1]})
+		end
+	end
+
+	local Pieces = {['Legs'] = {0, 0}, ['Head'] = {0, 0}; ['Body'] = {0, 0}}
+
+	for i,v in pairs(Armors) do
+		local ArmorSettings = ArmorModule[v[2]]
+
+		if ArmorSettings then
+			if ArmorSettings.MeleeDamage > Pieces[v[3]][2] and ArmorSettings.Level <= Level then
+				if Pieces[v[3]][1] ~= 0 then
+					if Pieces[v[3]][5] ~= 'Legendary' then
+						table.insert(SellTable, {"Armor", Pieces[v[3]][1]})
+					end
+				end
+
+				Pieces[v[3]] = {v[1], ArmorSettings.MeleeDamage, v, nil, ArmorSettings.Rarity, v[4]}
+			elseif ArmorSettings.Level <= Level then
+				if Pieces[v[3]][2] ~= ArmorSettings.MeleeDamage then
+					if ArmorSettings.Rarity ~= 'Legendary' then
+						table.insert(SellTable, {"Armor", v[1]})
+					end
+				elseif v[4] > Pieces[v[3]][6] then
+					if Pieces[v[3]][5] ~= 'Legendary' then
+						table.insert(SellTable, {"Armor", Pieces[v[3]][1]})
+					end
+				else
+					if ArmorSettings.Rarity ~= 'Legendary' then
+						table.insert(SellTable, {"Armor", v[1]})
+					end
+				end
+			end
+		end
+	end
+
+	local function EquipArmor(Id)
+		RemoteEvent:FireServer('EquipArmor', Id)
+	end
+
+	if Pieces.Legs[1] ~= 0 then
+		if EquippedArmorLegs ~= Pieces.Legs[1] then
+			EquipArmor(Pieces.Legs[1])
+		end
+	end
+
+	if Pieces.Body[1] ~= 0 then
+		if EquippedArmorBody ~= Pieces.Body[1] then
+			EquipArmor(Pieces.Body[1])
+		end
+	end
+
+	if Pieces.Head[1] ~= 0 then
+		if EquippedArmorHead ~= Pieces.Head[1] then
+			EquipArmor(Pieces.Head[1])
+		end
+	end
+
+	if #SellTable > 0 then
+		SellItems()
+	end
+end
+
+if GameType.Value == 'Lobby' then
+	CheckBackpack()
+	CreateLobby()
 else
-    AttackEnemy:Fire()
-    if _G.TeleportKill then
-        while Heartbeat:wait() do
-            for i,v in pairs(workspace.Enemies:GetChildren()) do
-                local Humanoid = v:FindFirstChildWhichIsA('Humanoid')
-                local Part = v:FindFirstChildWhichIsA('BasePart')
-                if Humanoid and Part then
-                    if Humanoid.Health > 0 then
-                        if Player.Character then
-                            local FindPlayerHumanoid = Player.Character:FindFirstChildWhichIsA('Humanoid')
-                            if FindPlayerHumanoid then
-                                if FindPlayerHumanoid.Health > 0 then
-                                    if not Bosses[v.Name] then
-                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,15,0))
-                                    else
-				                        OnBoss:Fire(Humanoid)
-                                        Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,5,15))
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
+	repeat wait() until DungeonStarted.Value
+	
+	AttackEnemy:Fire()
+	while Heartbeat:wait() do
+		for i,v in pairs(workspace.Enemies:GetChildren()) do
+			local Humanoid = v:FindFirstChildWhichIsA('Humanoid')
+			local Part = v:FindFirstChildWhichIsA('BasePart')
+			if Humanoid and Part then
+				if Humanoid.Health > 0 then
+					if Player.Character then
+						local FindPlayerHumanoid = Player.Character:FindFirstChildWhichIsA('Humanoid')
+						if FindPlayerHumanoid then
+							if FindPlayerHumanoid.Health > 0 then
+								if not Bosses[v.Name] then
+									Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,15,0))
+								else
+									OnBoss:Fire(Humanoid)
+									Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,5,15))
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 end
