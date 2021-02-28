@@ -121,9 +121,9 @@ local Running = false
 OnBoss.Event:connect(function(Boss)
     if not Running then
         Running = true
-	while Boss.Health > 0 and wait() end
-	wait(.5)
-	CreateLobby()
+    	while Boss.Health > 0 and wait() do end
+    	wait(.5)
+    	CreateLobby()
     end
 end)
 
@@ -147,7 +147,7 @@ else
                                     if not Bosses[v.Name] then
                                         Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,10,0))
                                     else
-				        OnBoss:Fire(Humanoid)
+				                        OnBoss:Fire(Humanoid)
                                         Player.Character:SetPrimaryPartCFrame(Part.CFrame * CFrame.new(0,5,8))
                                     end
                                 end
