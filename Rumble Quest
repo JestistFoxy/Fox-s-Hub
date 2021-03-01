@@ -1,4 +1,4 @@
-print('Loading Hack v22')
+print('Loading Hack v23')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
@@ -172,6 +172,7 @@ function CheckBackpack()
 
 	local ArmorModule = require(ReplicatedStorage:WaitForChild('Modules'):WaitForChild('ItemData'):WaitForChild('Armors'))
 	local WeaponsModules = ReplicatedStorage:WaitForChild('Modules'):WaitForChild('Weapons')
+	local CosmeticsFolder = ReplicatedStorage:WaitForChild('Assets'):WaitForChild('Cosmetics')
 
 	local Weapons = LocalData.Weapons
 	local Abilities = LocalData.Abilities
@@ -184,6 +185,14 @@ function CheckBackpack()
 	local EquippedArmorHead = LocalData.EquippedArmorHead
 	local EquippedArmorBody = LocalData.EquippedArmorBody
 	local EquippedArmorLegs = LocalData.EquippedArmorLegs
+	
+	local Cosmetics = LocalData.Cosmetics
+	local EquippedCosmetics = {
+	    [LocalData.EquippedCosmeticBack] = true,
+	    [LocalData.EquippedCosmeticAura] = true,
+	    [LocalData.EquippedCosmeticHat] = true,
+	    [LocalData.EquippedCosmeticCostume] = true,
+	}
 
 	local AvaliableWeaponsTable = {}
 
@@ -191,6 +200,49 @@ function CheckBackpack()
 
 	local function SellItems()
 		RemoteFunction:InvokeServer("SellItems", SellTable) 
+	end
+	
+	local CantSell = {
+	    ['Legendary'] = true;
+	    ['Epic'] = true;
+	    ['Rare'] = true;
+	}
+
+	local Found = {}
+
+	for i,v in pairs(Cosmetics) do
+	    local Id = v[1]
+	    local ItemName = v[2]
+	    local Type = v[3]
+	    local Color = v[4]
+
+	    local FindCosmeticFolder = CosmeticsFolder:FindFirstChild(Type)
+
+	    if FindCosmeticFolder then
+		local FindItem = FindCosmeticFolder:FindFirstChild(ItemName)
+		if FindItem then
+		    local ItemKey = ItemName
+
+		    if Color then
+			ItemKey = ItemName..Color
+		    end
+
+		    if not CantSell[FindItem.Rarity.Value] then
+			if Color ~= 'Rainbow' then
+			    table.insert(SellTable, {"Cosmetic", Id})
+			end
+		    elseif Found[ItemKey] then
+			if not EquippedCosmetics[Id] then
+			    table.insert(SellTable, {"Cosmetic", Id})
+			else
+			    table.insert(SellTable, {"Cosmetic", Found[ItemKey]})
+			    Found[ItemKey] = Id
+			end
+		    else
+			Found[ItemKey] = Id
+		    end
+		end
+	    end
 	end
 
 	for i,v in pairs(Weapons) do
