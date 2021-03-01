@@ -1,4 +1,4 @@
-print('Loading Hack v23')
+print('Loading Hack v24')
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
