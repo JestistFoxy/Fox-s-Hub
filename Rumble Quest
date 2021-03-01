@@ -133,12 +133,7 @@ OnBoss.Event:connect(function(Boss)
 end)
 
 TeleportService.TeleportInitFailed:connect(function()
-    if GameType.Value == 'Lobby' then
-        CheckBackpack()
-        CreateLobby()
-    else
-        TeleportService:Teleport(4390380541, Player)
-    end
+	TeleportService:Teleport(4390380541, Player)
 end)
 
 function UpgradeEquippedItem(Items)
