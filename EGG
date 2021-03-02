@@ -1,0 +1,69 @@
+local Player = game.Players.LocalPlayer
+local PG = Player:FindFirstChild('PlayerGui')
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+
+function GetNewClass()
+    ReplicatedStorage.Client.Spin:InvokeServer()
+end
+
+farming = false
+
+
+game:GetService('UserInputService').InputBegan:connect(function(Input)
+    if Input.KeyCode.Name == 'Q' then
+        farming = (not farming)
+    end
+end)
+
+while wait() do
+    while farming and wait() do
+        local Character = Player.Character
+        if Character then
+            local Level = 0
+            
+            repeat
+                if farming then
+                    local Character = Player.Character
+                    
+                    if Character then
+                        local Head = Character:FindFirstChild('Head')
+                        local Humanoid = Character:FindFirstChild('Humanoid')
+                        if Head and Humanoid then
+                            if PG:FindFirstChild('IntroGui') then
+                                if PG:FindFirstChild('IntroGui').Enabled then
+                                    if Humanoid.Health > 0 then
+                                        PG:FindFirstChild('IntroGui').Enabled = false
+                                        game:GetService("ReplicatedStorage").Client.Intro:InvokeServer()
+                                        game:GetService("ReplicatedStorage").Client.Teleport:InvokeServer()
+                                    end
+                                end
+                            end
+                            
+                            local PlayerFolder = ReplicatedStorage:FindFirstChild(Player.UserId..'Client')
+                            
+                            if Head:FindFirstChild('LevelBoard') then
+                                Level = Head.LevelBoard.Frame.TextLabel.Text
+                            end
+                            
+                            Humanoid:UnequipTools()
+                        
+                            local Backpack = Player.Backpack:GetChildren()
+                            
+                            for i,v in pairs(Backpack) do
+                                Humanoid:EquipTool(v)
+                                wait()
+                                v:Activate()
+                            end
+                        end
+                    end
+                    
+                    wait()
+                else
+                    break
+                end
+            until tonumber(Level) >= 25
+            
+            GetNewClass()
+        end
+    end
+end
