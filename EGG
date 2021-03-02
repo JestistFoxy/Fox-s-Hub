@@ -1,4 +1,4 @@
-warn('Loading Hack v7')
+warn('Loading Hack v8')
 
 local Player = game.Players.LocalPlayer
 local PG = Player:FindFirstChild('PlayerGui')
@@ -39,13 +39,14 @@ while wait() do
                             if PG:FindFirstChild('IntroGui') then
                                 if PG:FindFirstChild('IntroGui').Enabled then
                                     if Humanoid.Health > 0 then
+                                        game:GetService("ReplicatedStorage").Client.Intro:InvokeServer()
+                                        game:GetService("ReplicatedStorage").Client.Teleport:InvokeServer()
                                         PG:FindFirstChild('IntroGui').Enabled = false
                                         PG:FindFirstChild('StatsGui').Enabled = true
                                         local Camera = workspace.CurrentCamera
                                         Camera.CameraType = "Custom"
                                         Camera.CameraSubject = Humanoid
-                                        game:GetService("ReplicatedStorage").Client.Intro:InvokeServer()
-                                        game:GetService("ReplicatedStorage").Client.Teleport:InvokeServer()
+                                        wait()
                                     end
                                 end
                             end
