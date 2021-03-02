@@ -1,4 +1,4 @@
-warn('Loading Hack v25')
+warn('Loading Hack v26')
 
 local Selected = _G['Selected']
 
