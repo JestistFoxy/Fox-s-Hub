@@ -1,4 +1,4 @@
-warn('Loading Hack v4')
+warn('Loading Hack v5')
 
 local Player = game.Players.LocalPlayer
 local PG = Player:FindFirstChild('PlayerGui')
@@ -8,8 +8,7 @@ function GetNewClass()
     ReplicatedStorage.Client.Spin:InvokeServer()
 end
 
-farming = false
-
+farming = true
 
 game:GetService('UserInputService').InputBegan:connect(function(Input)
     if Input.KeyCode.Name == 'Q' then
@@ -67,7 +66,7 @@ while wait() do
                                 v:Activate()
                             end
                             
-                            if tonumber(Level) >= 25 then
+                            if tonumber(Level) >= 10 then
                                 Humanoid.Health = 0
                                 break
                             end
@@ -78,7 +77,7 @@ while wait() do
                 else
                     break
                 end
-            until tonumber(Level) >= 25
+            until tonumber(Level) >= 10
             
             GetNewClass()
         end
