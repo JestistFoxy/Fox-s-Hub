@@ -1,4 +1,4 @@
-warn('Loading Hack v6')
+warn('Loading Hack v7')
 
 local Player = game.Players.LocalPlayer
 local PG = Player:FindFirstChild('PlayerGui')
@@ -81,7 +81,9 @@ while wait() do
                 end
             until tonumber(Level) >= 10
             
-            GetNewClass()
+            if tonumber(Level) >= 10 then
+                GetNewClass()
+            end
         end
     end
 end
