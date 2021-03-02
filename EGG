@@ -1,3 +1,5 @@
+warn('Loading Hack v1')
+
 local Player = game.Players.LocalPlayer
 local PG = Player:FindFirstChild('PlayerGui')
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
