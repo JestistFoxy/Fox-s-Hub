@@ -1,4 +1,4 @@
-warn('Loading Hack v26')
+warn('Loading Hack v27')
 
 local Selected = _G['Selected']
 
@@ -104,7 +104,7 @@ function FindBestDungeon()
 			end
 		end
 	elseif Dungeons[_G['Selected']] then
-		return Dungeons[_G['Selected'][3]]
+		return Dungeons[_G['Selected']][3]
 	end
 end
 
