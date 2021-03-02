@@ -1,7 +1,11 @@
-print('Loading Hack v24')
+warn('Loading Hack v25')
+
+local Selected = _G['Selected']
 
 if not _G['NotSynapse'] then
 	syn.queue_on_teleport([[
+	_G['Selected'] = Selected
+	print(Selected, _G['Selected'])
         loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
     ]])
 end
@@ -93,11 +97,14 @@ function FindBestDungeon()
 		[19] = {6, 'Medium', 'Caves'};
 		[20] = {1, 'Easy', 'Caves'};
 	}
-
-	for i = 1, #Dungeons do
-		if Level >= Dungeons[i][1] then
-			return Dungeons[i][3], Dungeons[i][2]
+	if not _G['Selected'] then
+		for i = 1, #Dungeons do
+			if Level >= Dungeons[i][1] then
+				return Dungeons[i][3], Dungeons[i][2]
+			end
 		end
+	elseif Dungeons[_G['Selected'] then
+		return Dungeons[_G['Selected'][3]]
 	end
 end
 
