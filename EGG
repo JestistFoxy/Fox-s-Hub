@@ -1,4 +1,4 @@
-warn('Loading Hack v5')
+warn('Loading Hack v6')
 
 local Player = game.Players.LocalPlayer
 local PG = Player:FindFirstChild('PlayerGui')
@@ -64,6 +64,8 @@ while wait() do
                                 Humanoid:EquipTool(v)
                                 wait()
                                 v:Activate()
+                                wait()
+                                v:Deactivate()
                             end
                             
                             if tonumber(Level) >= 10 then
