@@ -1,4 +1,4 @@
-warn('Loading Hack v1')
+warn('Loading Hack v2')
 
 local Player = game.Players.LocalPlayer
 local PG = Player:FindFirstChild('PlayerGui')
@@ -15,6 +15,12 @@ game:GetService('UserInputService').InputBegan:connect(function(Input)
     if Input.KeyCode.Name == 'Q' then
         farming = (not farming)
     end
+end)
+
+Player.Idled:connect(function()
+    local VirtualUser = game:GetService('VirtualUser')
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
 end)
 
 while wait() do
@@ -35,6 +41,9 @@ while wait() do
                                 if PG:FindFirstChild('IntroGui').Enabled then
                                     if Humanoid.Health > 0 then
                                         PG:FindFirstChild('IntroGui').Enabled = false
+                                        local Camera = workspace.CurrentCamera
+                                        Camera.CameraType = "Custom"
+                                        Camera.CameraSubject = Humanoid
                                         game:GetService("ReplicatedStorage").Client.Intro:InvokeServer()
                                         game:GetService("ReplicatedStorage").Client.Teleport:InvokeServer()
                                     end
