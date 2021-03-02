@@ -1,4 +1,4 @@
-warn('Loading Hack v2')
+warn('Loading Hack v4')
 
 local Player = game.Players.LocalPlayer
 local PG = Player:FindFirstChild('PlayerGui')
@@ -41,6 +41,7 @@ while wait() do
                                 if PG:FindFirstChild('IntroGui').Enabled then
                                     if Humanoid.Health > 0 then
                                         PG:FindFirstChild('IntroGui').Enabled = false
+                                        PG:FindFirstChild('StatsGui').Enabled = true
                                         local Camera = workspace.CurrentCamera
                                         Camera.CameraType = "Custom"
                                         Camera.CameraSubject = Humanoid
@@ -64,6 +65,11 @@ while wait() do
                                 Humanoid:EquipTool(v)
                                 wait()
                                 v:Activate()
+                            end
+                            
+                            if tonumber(Level) >= 25 then
+                                Humanoid.Health = 0
+                                break
                             end
                         end
                     end
