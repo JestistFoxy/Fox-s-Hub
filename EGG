@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v12")
+warn("[Fox's Hub] Loading Hack v13")
 
 local Player = game.Players.LocalPlayer
 
@@ -57,10 +57,10 @@ local Farmings = {
 }
 
 local RarityColors = {
-	['Myth'] = Color3.fromRGB(255, 170, 0);
+	['Myth'] = Color3.fromRGB(255, 112, 10);
 	['Legend'] = Color3.fromRGB(170, 85, 255);
-	['Rare'] = Color3.fromRGB(255,50,50);
-	['Uncommon'] = Color3.fromRGB(100,100,100);
+	['Rare'] = Color3.fromRGB(0, 85, 255);
+	['Uncommon'] = Color3.fromRGB(0, 255, 0);
 	['Common'] = Color3.fromRGB(0,0,0);
 }
 
@@ -75,7 +75,7 @@ function UpdateAbilityUI()
 			
 			if RarityColors[Rarity] then
 				ElementUI.TextStrokeColor3 = RarityColors[Rarity]
-				ElementUI.TextStrokeTransparency = .9
+				ElementUI.TextStrokeTransparency = .5
 			end
 			
 			break
