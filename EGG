@@ -74,8 +74,8 @@ function UpdateAbilityUI()
 			local Rarity = AbilityInfo[3]
 			
 			if RarityColors[Rarity] then
-				Element.TextStrokeColor3 = RarityColors[Rarity]
-				Element.TextStrokeTransparency = .9
+				ElementUI.TextStrokeColor3 = RarityColors[Rarity]
+				ElementUI.TextStrokeTransparency = .9
 			end
 			
 			break
