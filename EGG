@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v11")
+warn("[Fox's Hub] Loading Hack v12")
 
 local Player = game.Players.LocalPlayer
 
@@ -56,8 +56,31 @@ local Farmings = {
 	['Ability'] = false;
 }
 
+local RarityColors = {
+	['Myth'] = Color3.fromRGB(255, 170, 0);
+	['Legend'] = Color3.fromRGB(170, 85, 255);
+	['Rare'] = Color3.fromRGB(255,50,50);
+	['Uncommon'] = Color3.fromRGB(100,100,100);
+	['Common'] = Color3.fromRGB(0,0,0);
+}
+
 function UpdateAbilityUI()
-	Element.Text = GetElement:InvokeServer()
+	local Element = GetElement:InvokeServer()
+	
+	Element.Text = Element
+	
+	for _, AbilityInfo in pairs(AbilityRarities) do
+		if AbilityInfo[1] == Element then
+			local Rarity = AbilityInfo[3]
+			
+			if RarityColors[Rarity] then
+				Element.TextStrokeColor3 = RarityColors[Rarity]
+				Element.TextStrokeTransparency = .9
+			end
+			
+			break
+		end
+	end
 end
 
 function GetNewAbility()
