@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v10")
+warn("[Fox's Hub] Loading Hack v11")
 
 local Player = game.Players.LocalPlayer
 
@@ -23,6 +23,8 @@ while not UI and wait() do
 		UI = game:GetObjects("rbxassetid://"..6469772512)[1]
 	end)
 end
+
+UI.ResetOnSpawn = false
 
 if syn then
 	syn.protect_gui(UI)
