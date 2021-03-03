@@ -18,7 +18,7 @@ local AbilityRarities = ClientEvents.GetRarities:InvokeServer()
 
 local UI
 
-while not UI and wait do
+while not UI and wait() do
 	pcall(function()
 		UI = game:GetObjects("rbxassetid://"..6469772512)[1]
 	end)
