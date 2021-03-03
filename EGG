@@ -1,90 +1,263 @@
-warn('Loading Hack v8')
+warn("[Fox's Hub] Loading Hack v9")
 
 local Player = game.Players.LocalPlayer
-local PG = Player:FindFirstChild('PlayerGui')
-local ReplicatedStorage = game:GetService('ReplicatedStorage')
 
-function GetNewClass()
-    ReplicatedStorage.Client.Spin:InvokeServer()
+local PG = Player:FindFirstChild('PlayerGui')
+
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local VirtualUser = game:GetService('VirtualUser')
+
+local PlayerFolder = ReplicatedStorage:FindFirstChild(Player.UserId..'Client')
+
+local ClientEvents = ReplicatedStorage.Client
+
+local GetElement = ClientEvents.GetElement
+
+local AbilityRarities = ClientEvents.GetRarities:InvokeServer()
+
+local UI = game:GetObjects("rbxassetid://"..6469772512)[1]
+
+if syn then
+	syn.protect_gui(UI)
 end
 
-farming = true
+UI.Parent = game:GetService('CoreGui')
+
+local Sounds = UI:FindFirstChild('Sounds')
+
+local Selection = UI.Frame.Frame.Frame
+local CurrentUI = UI.Frame.Current.Frame
+
+local Rarities = Selection.Rarities
+local Farms = Selection.FarmingType
+
+local Element = CurrentUI.Ability
+
+local ActiveRarity = {
+	['Myth'] = false;
+	['Legend'] = false;
+	['Rare'] = false;
+	['Uncommon'] = false;
+	['Common'] = false;
+}
+
+local Farmings = {
+	['Spins'] = false;
+	['Levels'] = false;
+	['Ability'] = false;
+}
+
+function UpdateAbilityUI()
+	Element.Text = GetElement:InvokeServer()
+end
+
+function GetNewAbility()
+	local NewAbility = ReplicatedStorage.Client.Spin:InvokeServer()[1]
+	
+	for _, AbilityInfo in pairs(AbilityRarities) do
+		if AbilityInfo[1] == NewAbility then
+			UpdateAbilityUI()
+			return AbilityInfo[1], AbilityInfo[3]
+		end
+	end
+end
+
+function FarmAbility()
+	local RarityEnabled = false
+
+	for i,v in pairs(ActiveRarity) do
+		if v then
+			RarityEnabled = v
+			break
+		end
+	end
+
+	if RarityEnabled then
+		while wait() and Farmings.Ability and RarityEnabled do
+			RarityEnabled = false
+
+			for i,v in pairs(ActiveRarity) do
+				if v then
+					RarityEnabled = v
+					break
+				end
+			end
+
+			if RarityEnabled then
+				local AbilityName, AbilityRarity = GetNewAbility()
+
+				if ActiveRarity[AbilityRarity] then
+					if Sounds then
+						Sounds.Success:Play()
+					end
+					warn("[Fox's Hub] You got ".. AbilityName..' ('.. AbilityRarity..')')
+					break
+				end
+			else
+				if Sounds then
+					Sounds.Error:Play()
+				end
+			end
+		end
+
+		Farms.Ability.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+		Farmings.Ability = false
+	else
+		Farms.Ability.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+		Farmings.Ability = false
+		if Sounds then
+			Sounds.Error:Play()
+		end
+	end
+end
+
+function Attack()
+	for i,v in pairs(Player.Backpack:GetChildren()) do
+		PlayerFolder.StartMove:FireServer(v.Name)
+		PlayerFolder.EndMove:FireServer(v.Name)
+	end
+end
+
+function CheckDied(Humanoid)
+	local IGUI = PG:FindFirstChild('IntroGui')
+	local SGUI = PG:FindFirstChild('StatsGui')
+	if Humanoid then
+		if IGUI and SGUI then
+			if IGUI.Enabled then
+				if Humanoid.Health > 0 then
+					ClientEvents.Intro:InvokeServer()
+					ClientEvents.Teleport:InvokeServer()
+					IGUI.Enabled = false
+					SGUI.Enabled = true
+					local Camera = workspace.CurrentCamera
+					Camera.CameraType = "Custom"
+					Camera.CameraSubject = Humanoid
+					wait()
+				end
+			end
+		end
+	end
+end
+
+function FarmSpins()
+	while Farmings.Spins and wait() do
+		local Character = Player.Character
+		if Character then
+			local Level = 0
+			
+			repeat
+				wait()
+				if Farmings.Spins then
+					local Character = Player.Character
+					
+					if Character then
+						local Head = Character:FindFirstChild('Head')
+						local Humanoid = Character:FindFirstChildWhichIsA('Humanoid')
+						
+						if Head and Humanoid then
+							CheckDied(Humanoid)
+							
+							if Head:FindFirstChild('LevelBoard') then
+								Level = tonumber(Head.LevelBoard.Frame.TextLabel.Text)
+							end
+							
+							Humanoid:UnequipTools()
+							
+							Attack()
+							
+							if Level >= 10 then
+								Humanoid.Health = 0
+								break
+							end
+						end
+					end
+				end
+			until (not Farmings.Spins) or Level >= 10
+			
+			if Level >= 10 and Farmings.Spins then
+				GetNewAbility()
+				Level = 0
+			end
+		end
+	end
+end
+
+function FarmLevels()
+	while Farmings.Levels and wait() do
+		local Character = Player.Character
+		
+		if Character then
+			local Humanoid = Character:FindFirstChildWhichIsA('Humanoid')
+			if Humanoid then
+				CheckDied(Humanoid)
+				
+				Humanoid:UnequipTools()
+
+				Attack()
+			end
+		end
+	end
+end
+
+function FarmingFunctions()
+	if Farmings.Spins then
+		FarmSpins()
+	elseif Farmings.Ability then
+		FarmAbility()
+	elseif Farmings.Levels then
+		FarmLevels()
+	end
+end
+
+for i,v in pairs(Rarities:GetChildren()) do
+	if v:IsA('TextButton') then
+		v.Frame.ImageButton.MouseButton1Click:connect(function()
+			ActiveRarity[v.Name] = (not ActiveRarity[v.Name])
+			
+			if not ActiveRarity[v.Name] then
+				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+			else
+				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			end
+		end)
+	end
+end
+
+for i,v in pairs(Farms:GetChildren()) do
+	if v:IsA('TextButton') then
+		v.Frame.ImageButton.MouseButton1Click:connect(function()
+			for _,GUI in pairs(Farms:GetChildren()) do
+				if GUI:IsA('TextButton') then
+					GUI.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+					if GUI.Name ~= v.Name then
+						Farmings[GUI.Name] = false
+					end
+				end
+			end
+			
+			Farmings[v.Name] = (not Farmings[v.Name])
+			
+			if not Farmings[v.Name] then
+				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+			else
+				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			end
+			
+			FarmingFunctions()
+		end)
+	end
+end
 
 game:GetService('UserInputService').InputBegan:connect(function(Input)
-    if Input.KeyCode.Name == 'Q' then
-        farming = (not farming)
-    end
+	if Input.KeyCode == Enum.KeyCode.RightShift then
+		UI.Enabled = (not UI.Enabled)
+	end
 end)
 
 Player.Idled:connect(function()
-    local VirtualUser = game:GetService('VirtualUser')
-    VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new())
+	VirtualUser:CaptureController()
+	VirtualUser:ClickButton2(Vector2.new())
 end)
 
-while wait() do
-    while farming and wait() do
-        local Character = Player.Character
-        if Character then
-            local Level = 0
-            
-            repeat
-                if farming then
-                    local Character = Player.Character
-                    
-                    if Character then
-                        local Head = Character:FindFirstChild('Head')
-                        local Humanoid = Character:FindFirstChild('Humanoid')
-                        if Head and Humanoid then
-                            if PG:FindFirstChild('IntroGui') then
-                                if PG:FindFirstChild('IntroGui').Enabled then
-                                    if Humanoid.Health > 0 then
-                                        game:GetService("ReplicatedStorage").Client.Intro:InvokeServer()
-                                        game:GetService("ReplicatedStorage").Client.Teleport:InvokeServer()
-                                        PG:FindFirstChild('IntroGui').Enabled = false
-                                        PG:FindFirstChild('StatsGui').Enabled = true
-                                        local Camera = workspace.CurrentCamera
-                                        Camera.CameraType = "Custom"
-                                        Camera.CameraSubject = Humanoid
-                                        wait()
-                                    end
-                                end
-                            end
-                            
-                            local PlayerFolder = ReplicatedStorage:FindFirstChild(Player.UserId..'Client')
-                            
-                            if Head:FindFirstChild('LevelBoard') then
-                                Level = Head.LevelBoard.Frame.TextLabel.Text
-                            end
-                            
-                            Humanoid:UnequipTools()
-                        
-                            local Backpack = Player.Backpack:GetChildren()
-                            
-                            for i,v in pairs(Backpack) do
-                                Humanoid:EquipTool(v)
-                                wait()
-                                v:Activate()
-                                wait()
-                                v:Deactivate()
-                            end
-                            
-                            if tonumber(Level) >= 10 then
-                                Humanoid.Health = 0
-                                break
-                            end
-                        end
-                    end
-                    
-                    wait()
-                else
-                    break
-                end
-            until tonumber(Level) >= 10
-            
-            if tonumber(Level) >= 10 then
-                GetNewClass()
-            end
-        end
-    end
-end
+UpdateAbilityUI()
