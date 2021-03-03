@@ -40,7 +40,7 @@ local CurrentUI = UI.Frame.Current.Frame
 local Rarities = Selection.Rarities
 local Farms = Selection.FarmingType
 
-local Element = CurrentUI.Ability
+local ElementUI = CurrentUI.Ability
 
 local ActiveRarity = {
 	['Myth'] = false;
@@ -67,7 +67,7 @@ local RarityColors = {
 function UpdateAbilityUI()
 	local Element = GetElement:InvokeServer()
 	
-	Element.Text = Element
+	ElementUI.Text = Element
 	
 	for _, AbilityInfo in pairs(AbilityRarities) do
 		if AbilityInfo[1] == Element then
