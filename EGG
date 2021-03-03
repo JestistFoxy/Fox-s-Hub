@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v9")
+warn("[Fox's Hub] Loading Hack v10")
 
 local Player = game.Players.LocalPlayer
 
@@ -16,7 +16,13 @@ local GetElement = ClientEvents.GetElement
 
 local AbilityRarities = ClientEvents.GetRarities:InvokeServer()
 
-local UI = game:GetObjects("rbxassetid://"..6469772512)[1]
+local UI
+
+while not UI and wait do
+	pcall(function()
+		UI = game:GetObjects("rbxassetid://"..6469772512)[1]
+	end)
+end
 
 if syn then
 	syn.protect_gui(UI)
@@ -91,7 +97,6 @@ function FarmAbility()
 					if Sounds then
 						Sounds.Success:Play()
 					end
-					warn("[Fox's Hub] You got ".. AbilityName..' ('.. AbilityRarity..')')
 					break
 				end
 			else
