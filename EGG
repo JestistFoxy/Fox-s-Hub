@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v13")
+warn("[Fox's Hub] Loading Hack v14")
 
 local Player = game.Players.LocalPlayer
 
@@ -172,42 +172,34 @@ end
 
 function FarmSpins()
 	while Farmings.Spins and wait() do
-		local Character = Player.Character
-		if Character then
-			local Level = 0
-			
-			repeat
-				wait()
-				if Farmings.Spins then
-					local Character = Player.Character
+		local Level = 0
+		wait()
+		if Farmings.Spins then
+			local Character = Player.Character
+				
+			if Character then
+				local Head = Character:FindFirstChild('Head')
+				local Humanoid = Character:FindFirstChildWhichIsA('Humanoid')
+				
+				if Head and Humanoid then
+					CheckDied(Humanoid)
 					
-					if Character then
-						local Head = Character:FindFirstChild('Head')
-						local Humanoid = Character:FindFirstChildWhichIsA('Humanoid')
-						
-						if Head and Humanoid then
-							CheckDied(Humanoid)
+					if Head:FindFirstChild('LevelBoard') then
+						Level = tonumber(Head.LevelBoard.Frame.TextLabel.Text)
+					else
+					    Level = 0
+					end
 							
-							if Head:FindFirstChild('LevelBoard') then
-								Level = tonumber(Head.LevelBoard.Frame.TextLabel.Text)
-							end
+					Humanoid:UnequipTools()
 							
-							Humanoid:UnequipTools()
+					Attack()
 							
-							Attack()
-							
-							if Level >= 10 then
-								Humanoid.Health = 0
-								break
-							end
-						end
+					if Level >= 10 and Farmings.Spins then
+					    GetNewAbility()
+						Humanoid.Health = 0
+						Level = 0
 					end
 				end
-			until (not Farmings.Spins) or Level >= 10
-			
-			if Level >= 10 and Farmings.Spins then
-				GetNewAbility()
-				Level = 0
 			end
 		end
 	end
