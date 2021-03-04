@@ -1,0 +1,8 @@
+local Scripts = {
+	[4390380541] = 'https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest';
+	[4375458071] = 'https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/EGG';
+}
+
+if Scripts[game.PlaceId] then
+	loadstring(game:HttpGet(Scripts[game.PlaceId]))();
+end
