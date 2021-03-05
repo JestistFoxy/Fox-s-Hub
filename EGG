@@ -1,6 +1,8 @@
-warn("[Fox's Hub] Loading Hack v14")
+warn("[Fox's Hub] Loading Hack v15")
 
-local Player = game.Players.LocalPlayer
+local Players = game.Players
+
+local Player = Players.LocalPlayer
 
 local PG = Player:FindFirstChild('PlayerGui')
 
@@ -39,8 +41,19 @@ local CurrentUI = UI.Frame.Current.Frame
 
 local Rarities = Selection.Rarities
 local Farms = Selection.FarmingType
+local ToggleESP = UI.Frame.ESP.Frame.Label.TextLabel.Activate
 
 local ElementUI = CurrentUI.Ability
+
+local ESPs = UI.ESP
+
+local ESPLayout = ESPs:WaitForChild('Layout')
+
+local AddESP = Instance.new("BindableEvent")
+
+local ESPActive = false
+
+local Connections = {}
 
 local ActiveRarity = {
 	['Myth'] = false;
@@ -64,20 +77,50 @@ local RarityColors = {
 	['Common'] = Color3.fromRGB(0,0,0);
 }
 
+local Elements = {}
+
+function CheckForSpaces(Ability)
+	local NewAbilityName = ''
+	
+	for i = 1, #Ability do
+		if string.upper(Ability:sub(i,i)) == Ability:sub(i,i) then
+			if i ~= 1 then
+				NewAbilityName = NewAbilityName..' '
+			end
+		end
+
+		NewAbilityName = NewAbilityName..Ability:sub(i,i)
+	end
+
+	return NewAbilityName
+end
+
+for i,v in pairs(Player.PlayerScripts.ClientEffects:GetChildren()) do
+	if v:IsA('Folder') then
+		local AbilityName = CheckForSpaces(v.Name)
+
+		Elements[AbilityName] = {}
+
+		for i,v in pairs(v:GetChildren()) do
+			table.insert(Elements[AbilityName], CheckForSpaces(v.Name))
+		end
+	end
+end
+
 function UpdateAbilityUI()
 	local Element = GetElement:InvokeServer()
-	
+
 	ElementUI.Text = Element
-	
+
 	for _, AbilityInfo in pairs(AbilityRarities) do
 		if AbilityInfo[1] == Element then
 			local Rarity = AbilityInfo[3]
-			
+
 			if RarityColors[Rarity] then
 				ElementUI.TextStrokeColor3 = RarityColors[Rarity]
 				ElementUI.TextStrokeTransparency = .5
 			end
-			
+
 			break
 		end
 	end
@@ -85,7 +128,7 @@ end
 
 function GetNewAbility()
 	local NewAbility = ReplicatedStorage.Client.Spin:InvokeServer()[1]
-	
+
 	for _, AbilityInfo in pairs(AbilityRarities) do
 		if AbilityInfo[1] == NewAbility then
 			UpdateAbilityUI()
@@ -176,26 +219,26 @@ function FarmSpins()
 		wait()
 		if Farmings.Spins then
 			local Character = Player.Character
-				
+
 			if Character then
 				local Head = Character:FindFirstChild('Head')
 				local Humanoid = Character:FindFirstChildWhichIsA('Humanoid')
-				
+
 				if Head and Humanoid then
 					CheckDied(Humanoid)
-					
+
 					if Head:FindFirstChild('LevelBoard') then
 						Level = tonumber(Head.LevelBoard.Frame.TextLabel.Text)
 					else
-					    Level = 0
+						Level = 0
 					end
-							
+
 					Humanoid:UnequipTools()
-							
+
 					Attack()
-							
+
 					if Level >= 10 and Farmings.Spins then
-					    GetNewAbility()
+						GetNewAbility()
 						Humanoid.Health = 0
 						Level = 0
 					end
@@ -208,12 +251,12 @@ end
 function FarmLevels()
 	while Farmings.Levels and wait() do
 		local Character = Player.Character
-		
+
 		if Character then
 			local Humanoid = Character:FindFirstChildWhichIsA('Humanoid')
 			if Humanoid then
 				CheckDied(Humanoid)
-				
+
 				Humanoid:UnequipTools()
 
 				Attack()
@@ -232,11 +275,121 @@ function FarmingFunctions()
 	end
 end
 
+function GetOthersElement(InPerson, Backpack)
+	for ElementName, ElementAttacks in pairs(Elements) do
+		for _,ElementAttack in pairs(ElementAttacks) do
+			if InPerson then
+				if InPerson.Name == ElementAttack then
+					return ElementName
+				end
+			end
+			if Backpack:FindFirstChild(ElementAttack) then
+				return ElementName
+			end
+		end
+	end
+end
+
+AddESP.Event:connect(function(Character)
+	local FindPlayer = game.Players:GetPlayerFromCharacter(Character)
+	
+	if ESPActive and FindPlayer then
+		local Head = Character:FindFirstChild('Head')
+		
+		if ESPs:FindFirstChild(Character.Name) then ESPs:FindFirstChild(Character.Name):Destroy() end
+		
+		if Head then
+			local Text = ''
+			
+			local NewESP = ESPLayout:Clone()
+			
+			NewESP.Name = Character.Name
+			
+			NewESP.Adornee = Head
+			NewESP.Parent = ESPs
+			
+			local Level = 0
+			
+			local Backpack = FindPlayer.Backpack
+			local InPerson = Character:FindFirstChildWhichIsA('Tool')
+			
+			local PlayerElement = GetOthersElement(InPerson, Backpack)
+			
+			repeat
+				if not PlayerElement then
+					PlayerElement = GetOthersElement(InPerson, Backpack)
+					wait()
+				end
+			until PlayerElement
+			
+			local LevelBoard = Head:FindFirstChild('LevelBoard')
+
+			if LevelBoard then
+				Level = tonumber(LevelBoard.Frame.TextLabel.Text)
+				
+				local LevelBoardChanged = LevelBoard.Frame.TextLabel.Changed:connect(function()
+					if LevelBoard.Parent ~= nil then
+						Level = tonumber(LevelBoard.Frame.TextLabel.Text)
+						
+						if PlayerElement then
+							Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
+							
+							NewESP.TextLabel.Text = Text
+						end
+					end
+				end)
+
+					table.insert(Connections[Character.Name], LevelBoardChanged)
+			end
+			
+			if PlayerElement then
+				Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
+			end
+			
+			NewESP.TextLabel.Text = Text
+			
+			NewESP.Enabled = true
+		end
+	end
+end)
+
+function CharacterFunction(AddPlayer)
+	local CharacterAdded = AddPlayer.CharacterAdded:connect(function(Character)
+		local Humanoid = Character:WaitForChild('Humanoid', 10)
+		
+		if Humanoid then
+			if Humanoid.Health <= 0 then
+				repeat
+					wait()
+				until Humanoid.Health > 0
+			end
+			AddESP:Fire(Character)
+		end
+	end)
+
+	Connections[AddPlayer.Name] = {CharacterAdded}
+	
+	local Character = AddPlayer.Character
+	
+	if Character then
+		AddESP:Fire(Character)
+	end
+end
+
+function ClearESPs()
+	for i,v in pairs(ESPs:GetChildren()) do
+		if v.Name ~= 'Layout' then
+			v:Destroy()
+		end
+	end
+end
+
+
 for i,v in pairs(Rarities:GetChildren()) do
 	if v:IsA('TextButton') then
 		v.Frame.ImageButton.MouseButton1Click:connect(function()
 			ActiveRarity[v.Name] = (not ActiveRarity[v.Name])
-			
+
 			if not ActiveRarity[v.Name] then
 				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
 			else
@@ -257,9 +410,9 @@ for i,v in pairs(Farms:GetChildren()) do
 					end
 				end
 			end
-			
+
 			Farmings[v.Name] = (not Farmings[v.Name])
-			
+
 			if not Farmings[v.Name] then
 				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
 			else
@@ -271,9 +424,40 @@ for i,v in pairs(Farms:GetChildren()) do
 	end
 end
 
+Players.PlayerAdded:connect(function(AddPlayer)
+	CharacterFunction(AddPlayer)
+end)
+
+Players.PlayerRemoving:connect(function(RemovePlayer)
+	if Connections[RemovePlayer.Name] then
+		for i,v in pairs(Connections[RemovePlayer.Name]) do
+			v:Disconnect()
+		end
+	end
+	
+	if ESPs:FindFirstChild(RemovePlayer.Name) then
+		ESPs:FindFirstChild(RemovePlayer.Name):Destroy()
+	end
+end)
+
+ToggleESP.MouseButton1Click:connect(function()
+	ESPActive = (not ESPActive)
+	
+	if not ESPActive then
+		ClearESPs()
+	else
+		for i,v in pairs(Players:GetPlayers()) do
+			CharacterFunction(v)
+		end
+	end
+end)
+
 game:GetService('UserInputService').InputBegan:connect(function(Input)
-	if Input.KeyCode == Enum.KeyCode.RightShift then
+	if Input.KeyCode == Enum.KeyCode.RightControl then
 		UI.Enabled = (not UI.Enabled)
+	elseif Input.KeyCode == Enum.KeyCode.Delete then
+		UI:Destroy()
+		script:Destroy()
 	end
 end)
 
