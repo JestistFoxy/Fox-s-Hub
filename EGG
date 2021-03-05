@@ -377,6 +377,12 @@ function CharacterFunction(AddPlayer)
 end
 
 function ClearESPs()
+	for i,v in pairs(Connections) do
+		for i, v in pairs(v) do
+			v:Disconnect()
+		end
+	end
+	
 	for i,v in pairs(ESPs:GetChildren()) do
 		if v.Name ~= 'Layout' then
 			v:Destroy()
