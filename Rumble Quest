@@ -1,10 +1,9 @@
-warn('Loading Hack v28')
+warn('Loading Hack v29')
 
 Selected = _G['Selected']
 
-if not _G['NotSynapse'] then
+if syn then
 	syn.queue_on_teleport([[
-	print(Selected, _G['Selected'])
     	_G['Selected'] = Selected
         loadstring(game:HttpGet("https://raw.githubusercontent.com/JestistFoxy/Fox-s-Hub/main/Rumble%20Quest"))();
     ]])
