@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v17")
+warn("[Fox's Hub] Loading Hack v16")
 
 local Players = game.Players
 
@@ -300,7 +300,6 @@ AddESP.Event:connect(function(Character)
 		if ESPs:FindFirstChild(Character.Name) then ESPs:FindFirstChild(Character.Name):Destroy() end
 
 		if Head then
-			print('[Part 2] '..Character.Name)
 			
 			local Text = ''
 
@@ -379,7 +378,6 @@ function CharacterFunction(AddPlayer)
 				until Humanoid.Health > 0
 			end
 			
-			print('[Part 1] '..Character.Name)
 			AddESP:Fire(Character)
 		end
 	end)
