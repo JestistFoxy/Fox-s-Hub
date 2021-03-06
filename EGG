@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v16")
+warn("[Fox's Hub] Loading Hack v17")
 
 local Players = game.Players
 
@@ -295,11 +295,13 @@ AddESP.Event:connect(function(Character)
 	local FindPlayer = game.Players:GetPlayerFromCharacter(Character)
 
 	if ESPActive and FindPlayer then
-		local Head = Character:FindFirstChild('Head')
+		local Head = Character:WaitForChild('Head')
 
 		if ESPs:FindFirstChild(Character.Name) then ESPs:FindFirstChild(Character.Name):Destroy() end
 
 		if Head then
+			print('[Part 2] '..Character.Name)
+			
 			local Text = ''
 
 			local NewESP = ESPLayout:Clone()
@@ -376,7 +378,8 @@ function CharacterFunction(AddPlayer)
 					wait()
 				until Humanoid.Health > 0
 			end
-
+			
+			print('[Part 1] '..Character.Name)
 			AddESP:Fire(Character)
 		end
 	end)
@@ -487,6 +490,13 @@ game:GetService('UserInputService').InputBegan:connect(function(Input)
 	if Input.KeyCode == Enum.KeyCode.RightControl then
 		UI.Enabled = (not UI.Enabled)
 	elseif Input.KeyCode == Enum.KeyCode.Delete then
+		ClearESPs()
+		ESPActive = false
+		
+		for i,v in pairs(Farmings) do
+			Farmings[i] = false
+		end
+		
 		UI:Destroy()
 		script:Destroy()
 	end
