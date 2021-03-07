@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v17")
+warn("[Fox's Hub] Loading Hack v18")
 
 local Players = game.Players
 
@@ -15,6 +15,7 @@ local PlayerFolder = ReplicatedStorage:FindFirstChild(Player.UserId..'Client')
 local ClientEvents = ReplicatedStorage.Client
 
 local GetElement = ClientEvents.GetElement
+local GetSpins = ClientEvents.GetSpins
 
 local AbilityRarities = ClientEvents.GetRarities:InvokeServer()
 
@@ -80,6 +81,12 @@ local RarityColors = {
 
 local Elements = {}
 
+function UpdateSpins()
+	local AmountOfSpins = GetSpins:InvokeServer()
+	
+	CurrentUI.Spins.Text = 'Spins: '..AmountOfSpins
+end
+
 function CheckForSpaces(Ability)
 	local NewAbilityName = ''
 
@@ -121,7 +128,7 @@ function UpdateAbilityUI()
 				ElementUI.TextStrokeColor3 = RarityColors[Rarity]
 				ElementUI.TextStrokeTransparency = .5
 			end
-
+			
 			break
 		end
 	end
@@ -132,6 +139,7 @@ function GetNewAbility()
 
 	for _, AbilityInfo in pairs(AbilityRarities) do
 		if AbilityInfo[1] == NewAbility then
+			UpdateSpins()
 			UpdateAbilityUI()
 			return AbilityInfo[1], AbilityInfo[3]
 		end
@@ -361,6 +369,14 @@ end)
 
 function CharacterFunction(AddPlayer)
 	local CharacterAdded = AddPlayer.CharacterAdded:connect(function(Character)
+		if Character.Name == Player.Name then
+			local Humanoid = Character:WaitForChild('Humanoid')
+			
+			local Connection2 = Humanoid.HealthChanged:connect(function()
+				UpdateSpins()
+			end)
+		end
+		
 		if Connections[Character.Name] then
 			for i,v in pairs(Connections[Character.Name]) do
 				if i > 1 then
@@ -505,4 +521,5 @@ Player.Idled:connect(function()
 	VirtualUser:ClickButton2(Vector2.new())
 end)
 
+UpdateSpins()
 UpdateAbilityUI()
