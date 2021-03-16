@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v18")
+warn("[Fox's Hub] Loading Hack v19")
 
 local Players = game.Players
 
@@ -215,7 +215,7 @@ function CheckDied(Humanoid)
 					local Camera = workspace.CurrentCamera
 					Camera.CameraType = "Custom"
 					Camera.CameraSubject = Humanoid
-					wait()
+					wait(.5)
 				end
 			end
 		end
