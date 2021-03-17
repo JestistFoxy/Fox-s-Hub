@@ -1,0 +1,19 @@
+warn('[Fox\'s Hub] Loading Hack v1')
+
+local ESP = game:GetObjects('rbxassetid://6528944949')[1]
+
+ESP.Parent = game.CoreGui
+
+function AddESP(Obj)
+	local NewESP = ESP:Clone()
+	NewESP.Adornee = Obj
+	NewESP.Parent = Obj
+	NewESP.TextLabel.Text = Obj.Name
+	NewESP.Enabled = true
+end
+
+workspace.ChildAdded:connect(function(v)
+	if v.Name == 'Bat' or v.Name == 'Shelter Key' or v.Name == 'Fire Extinguisher' or v.Name == 'Illumina' or v.Name == 'Axe' or v.Name == 'Sword' then
+		AddESP(v)
+	end
+end)
