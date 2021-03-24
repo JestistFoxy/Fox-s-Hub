@@ -507,7 +507,6 @@ function FixUI()
 end
 
 ConfirmUI.Confirm.TextLabel.ImageButton.MouseButton1Click:connect(function()
-	print(CurrentSelected)
 	if CurrentSelected then
 		Farmings[CurrentSelected] = true
 		
@@ -536,6 +535,7 @@ for i,v in pairs(Farms:GetChildren()) do
 			if not ConfirmUI.Visible and not Farmings[CurrentSelected] and CurrentSelected == nil then
 				Sounds.Click:Play()
 				CurrentSelected = v.Name
+				ConfirmUI.Label.TextLabel.Text = 'Start '..v.Name..' Farming'
 				ConfirmUI.Visible = true
 			elseif Farmings[CurrentSelected] then
 				Farmings[CurrentSelected] = false
