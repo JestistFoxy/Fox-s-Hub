@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v21")
+warn("[Fox's Hub] Loading Hack v22")
 
 local Players = game.Players
 
@@ -45,6 +45,7 @@ local ElementSelectionUI = UI.Frame.Frame.ElementSelector.Frame.ScrollingFrame
 local Rarities = Selection.Rarities
 local Farms = Selection.FarmingType
 local ToggleESP = UI.Frame.ESP.Frame.Label.TextLabel.Activate
+local LogUI = UI.Frame.Logs.ScrollingFrame
 
 local CurrentElementUI = CurrentUI.Ability
 local NewAbilityButton = CurrentUI.NewAbility.TextLabel.TextButton
@@ -88,6 +89,45 @@ local RarityColors = {
 }
 
 local Elements = {}
+
+local Logged = {}
+
+function UpdateLogs(Element, Rarity)
+	local Time = os.time()
+	
+	local Date, Hour = os.date('%x', Time), os.date('%X', Time)
+	
+	if not Logged[Element] then Logged[Element] = 0 end
+	
+	Logged[Element] = Logged[Element] +  1
+	
+	local NewUI = UI.LogLayout.LogLayout:Clone()
+	
+	NewUI.Text = Element .. ' '.. Date ..' '.. Hour
+	
+	if RarityColors[Rarity] then
+		NewUI.TextStrokeColor3 = RarityColors[Rarity]
+		NewUI.TextStrokeTransparency = .5
+	end
+	
+	NewUI.LayoutOrder = -(#LogUI:GetChildren())
+	NewUI.Visible = true
+	NewUI.Parent = LogUI
+	
+	if #LogUI:GetChildren() >= 40 then
+		local HighestNumber = {-40}
+		
+		for i,v in pairs(LogUI:GetChildren()) do
+			if v.LayoutOrder > HighestNumber[1] then
+				HighestNumber = {v.LayoutOrder, v}
+			end
+		end
+		
+		if HighestNumber[2] then
+			HighestNumber[2]:Destroy()
+		end
+	end
+end
 
 function UpdateSpins()
 	local AmountOfSpins = GetSpins:InvokeServer()
@@ -159,6 +199,8 @@ function GetNewAbility()
 		if AbilityInfo[1] == NewAbility then
 			UpdateSpins()
 			UpdateAbilityUI()
+			UpdateLogs(AbilityInfo[1], AbilityInfo[3])
+			
 			return AbilityInfo[1], AbilityInfo[3]
 		end
 	end
