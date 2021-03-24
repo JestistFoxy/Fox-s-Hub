@@ -246,7 +246,7 @@ function FarmSpins()
 
 					Attack()
 
-					if Level >= 10 and Farmings.Spins then
+					if Level >= 2 and Farmings.Spins then
 						GetNewAbility()
 						Humanoid.Health = 0
 						Level = 0
