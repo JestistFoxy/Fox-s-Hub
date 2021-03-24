@@ -117,7 +117,7 @@ function UpdateLogs(Element, Rarity)
 	NewUI.LayoutOrder = -(#LogUI:GetChildren())
 	NewUI.Parent = LogUI
 	
-	NewUI.Visible = (SearchTerm == '' or Element:find(SearchTerm))
+	NewUI.Visible = (SearchTerm == '' or string.lower(Element):find(SearchTerm))
 end
 
 LogUI.UIListLayout.Changed:connect(function()
@@ -133,11 +133,11 @@ LogUI.Parent.Clear.TextLabel.Activate.MouseButton1Click:connect(function()
 end)
 
 LogUI.Parent.Search.Changed:connect(function()
-	SearchTerm = LogUI.Parent.Search.Text
+	SearchTerm = string.lower(LogUI.Parent.Search.Text)
 	
 	for i,v in pairs(LogUI:GetChildren()) do
 		if v:IsA('TextButton') then
-			v.Visible = (SearchTerm == '' or v.Name:find(SearchTerm))
+			v.Visible = (SearchTerm == '' or string.lower(v.Name):find(SearchTerm))
 		end
 	end
 end)
