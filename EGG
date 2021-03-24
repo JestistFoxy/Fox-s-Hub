@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v20")
+warn("[Fox's Hub] Loading Hack v21")
 
 local Players = game.Players
 
@@ -48,6 +48,8 @@ local ToggleESP = UI.Frame.ESP.Frame.Label.TextLabel.Activate
 
 local CurrentElementUI = CurrentUI.Ability
 local NewAbilityButton = CurrentUI.NewAbility.TextLabel.TextButton
+
+local ToggleElements = Selection.ToggleElements.TextLabel.Activate
 
 local ESPs = UI.ESP
 
@@ -521,6 +523,11 @@ end)
 ConfirmUI.Decline.TextLabel.ImageButton.MouseButton1Click:connect(function()
 	CurrentSelected = nil
 	ConfirmUI.Visible = false
+end)
+
+ToggleElements.MouseButton1Click:connect(function()
+	Sounds.Click:Play()
+	ElementSelectionUI.Parent.Parent.Visible = (not ElementSelectionUI.Parent.Parent.Visible)
 end)
 
 for i,v in pairs(Farms:GetChildren()) do
