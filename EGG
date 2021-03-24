@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v23")
+warn("[Fox's Hub] Loading Hack v24")
 
 local Players = game.Players
 
@@ -92,6 +92,8 @@ local Elements = {}
 
 local Logged = {}
 
+local SearchTerm = ''
+
 function UpdateLogs(Element, Rarity)
 	local Time = os.time()
 	
@@ -110,26 +112,37 @@ function UpdateLogs(Element, Rarity)
 		NewUI.TextStrokeTransparency = .5
 	end
 	
+	NewUI.Name = Element
+	
 	NewUI.LayoutOrder = -(#LogUI:GetChildren())
-	NewUI.Visible = true
 	NewUI.Parent = LogUI
 	
-	if #LogUI:GetChildren() >= 40 then
-		local HighestNumber = {-40}
-		
-		for i,v in pairs(LogUI:GetChildren()) do
-			if v:IsA('TextButton') then
-				if v.LayoutOrder > HighestNumber[1] then
-					HighestNumber = {v.LayoutOrder, v}
-				end
-			end
-		end
-		
-		if HighestNumber[2] then
-			HighestNumber[2]:Destroy()
+	NewUI.Visible = (SearchTerm == '' or Element:find(SearchTerm))
+end
+
+LogUI.UIListLayout.Changed:connect(function()
+	LogUI.CanvasSize = UDim2.fromOffset(0, LogUI.UIListLayout.AbsoluteContentSize.Y)
+end)
+
+LogUI.Parent.Clear.TextLabel.Activate.MouseButton1Click:connect(function()
+	for i,v in pairs(LogUI:GetChildren()) do
+		if v:IsA('TextButton') then
+			v:Destroy()
 		end
 	end
-end
+end)
+
+LogUI.Parent.Search.Changed:connect(function()
+	SearchTerm = LogUI.Parent.Search.Text
+	
+	for i,v in pairs(LogUI:GetChildren()) do
+		if v:IsA('TextButton') then
+			v.Visible = (SearchTerm == '' or v.Name:find(SearchTerm))
+		end
+	end
+end)
+
+LogUI.Parent.Search.Text = ''
 
 function UpdateSpins()
 	local AmountOfSpins = GetSpins:InvokeServer()
