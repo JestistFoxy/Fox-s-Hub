@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v19")
+warn("[Fox's Hub] Loading Hack v20")
 
 local Players = game.Players
 
@@ -39,12 +39,14 @@ local Sounds = UI:FindFirstChild('Sounds')
 
 local Selection = UI.Frame.Frame.Frame
 local CurrentUI = UI.Frame.Current.Frame
+local ConfirmUI = UI.Confirm
+local ElementSelectionUI = UI.Frame.Frame.ElementSelector.Frame.ScrollingFrame
 
 local Rarities = Selection.Rarities
 local Farms = Selection.FarmingType
 local ToggleESP = UI.Frame.ESP.Frame.Label.TextLabel.Activate
 
-local ElementUI = CurrentUI.Ability
+local CurrentElementUI = CurrentUI.Ability
 local NewAbilityButton = CurrentUI.NewAbility.TextLabel.TextButton
 
 local ESPs = UI.ESP
@@ -55,6 +57,8 @@ local AddESP = Instance.new("BindableEvent")
 
 local ESPActive = false
 
+local CurrentSelected
+
 local Connections = {}
 
 local ActiveRarity = {
@@ -64,6 +68,8 @@ local ActiveRarity = {
 	['Uncommon'] = false;
 	['Common'] = false;
 }
+
+local ActiveElements = {}
 
 local Farmings = {
 	['Spins'] = false;
@@ -83,7 +89,7 @@ local Elements = {}
 
 function UpdateSpins()
 	local AmountOfSpins = GetSpins:InvokeServer()
-	
+
 	CurrentUI.Spins.Text = 'Spins: '..AmountOfSpins
 end
 
@@ -118,19 +124,29 @@ end
 function UpdateAbilityUI()
 	local Element = GetElement:InvokeServer()
 
-	ElementUI.Text = Element
+	CurrentElementUI.Text = Element
 
 	for _, AbilityInfo in pairs(AbilityRarities) do
 		if AbilityInfo[1] == Element then
 			local Rarity = AbilityInfo[3]
 
 			if RarityColors[Rarity] then
-				ElementUI.TextStrokeColor3 = RarityColors[Rarity]
-				ElementUI.TextStrokeTransparency = .5
+				CurrentElementUI.TextStrokeColor3 = RarityColors[Rarity]
+				CurrentElementUI.TextStrokeTransparency = .5
 			end
-			
+
 			break
 		end
+	end
+end
+
+function Check(AbilityName, AbilityRarity)
+	if ActiveRarity[AbilityRarity] or ActiveElements[AbilityName] then
+		if Sounds then
+			Sounds.Success:Play()
+		end
+		
+		return true
 	end
 end
 
@@ -155,6 +171,15 @@ function FarmAbility()
 			break
 		end
 	end
+	
+	if not RarityEnabled then
+		for i,v in pairs(ActiveElements) do
+			if v then
+				RarityEnabled = v
+				break
+			end
+		end
+	end
 
 	if RarityEnabled then
 		while wait() and Farmings.Ability and RarityEnabled do
@@ -166,14 +191,31 @@ function FarmAbility()
 					break
 				end
 			end
+			
+			if not RarityEnabled then
+				for i,v in pairs(ActiveElements) do
+					if v then
+						RarityEnabled = v
+						break
+					end
+				end
+			end
 
 			if RarityEnabled then
 				local AbilityName, AbilityRarity = GetNewAbility()
 
-				if ActiveRarity[AbilityRarity] then
-					if Sounds then
-						Sounds.Success:Play()
-					end
+				if Check(AbilityName, AbilityRarity) then
+					CurrentSelected = 'Levels'
+					Farmings.Ability = false
+					Farmings.Levels = true
+					FixUI()
+					FarmingFunctions()
+					break
+				elseif GetSpins:InvokeServer() == 0 then
+					Farmings.Ability = false
+					Farmings.Spins = true
+					FixUI()
+					FarmingFunctions()
 					break
 				end
 			else
@@ -185,9 +227,11 @@ function FarmAbility()
 
 		Farms.Ability.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
 		Farmings.Ability = false
+		CurrentSelected = nil
 	else
 		Farms.Ability.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
 		Farmings.Ability = false
+		CurrentSelected = nil
 		if Sounds then
 			Sounds.Error:Play()
 		end
@@ -247,9 +291,18 @@ function FarmSpins()
 					Attack()
 
 					if Level >= 2 and Farmings.Spins then
-						GetNewAbility()
+						local AbilityName, AbilityRarity = GetNewAbility()
 						Humanoid.Health = 0
 						Level = 0
+						
+						if Check(AbilityName, AbilityRarity) then
+							CurrentSelected = 'Levels'
+							Farmings.Spins = false
+							Farmings.Levels = true
+							FixUI()
+							FarmingFunctions()
+							break
+						end
 					end
 				end
 			end
@@ -308,7 +361,7 @@ AddESP.Event:connect(function(Character)
 		if ESPs:FindFirstChild(Character.Name) then ESPs:FindFirstChild(Character.Name):Destroy() end
 
 		if Head then
-			
+
 			local Text = ''
 
 			local NewESP = ESPLayout:Clone()
@@ -343,7 +396,7 @@ AddESP.Event:connect(function(Character)
 
 						if PlayerElement then
 							Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
-							
+
 							if NewESP:FindFirstChild('TextLabel') then
 								NewESP.TextLabel.Text = Text
 							end
@@ -371,12 +424,12 @@ function CharacterFunction(AddPlayer)
 	local CharacterAdded = AddPlayer.CharacterAdded:connect(function(Character)
 		if Character.Name == Player.Name then
 			local Humanoid = Character:WaitForChild('Humanoid')
-			
+
 			local Connection2 = Humanoid.HealthChanged:connect(function()
 				UpdateSpins()
 			end)
 		end
-		
+
 		if Connections[Character.Name] then
 			for i,v in pairs(Connections[Character.Name]) do
 				if i > 1 then
@@ -384,7 +437,7 @@ function CharacterFunction(AddPlayer)
 				end
 			end
 		end
-		
+
 		local Humanoid = Character:WaitForChild('Humanoid', 10)
 
 		if Humanoid then
@@ -393,7 +446,7 @@ function CharacterFunction(AddPlayer)
 					wait()
 				until Humanoid.Health > 0
 			end
-			
+
 			AddESP:Fire(Character)
 		end
 	end)
@@ -438,28 +491,71 @@ for i,v in pairs(Rarities:GetChildren()) do
 	end
 end
 
+function FixUI()
+	for _,GUI in pairs(Farms:GetChildren()) do
+		if GUI:IsA('TextButton') then
+			GUI.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+			if GUI.Name ~= CurrentSelected then
+				Farmings[GUI.Name] = false
+			elseif Farmings[GUI.Name] then
+				GUI.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			else
+				GUI.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+			end
+		end
+	end
+end
+
+ConfirmUI.Confirm.TextLabel.ImageButton.MouseButton1Click:connect(function()
+	print(CurrentSelected)
+	if CurrentSelected then
+		Farmings[CurrentSelected] = true
+		
+		ConfirmUI.Visible = false
+		
+		FixUI()
+
+		FarmingFunctions()
+	end
+end)
+
+ConfirmUI.Decline.TextLabel.ImageButton.MouseButton1Click:connect(function()
+	CurrentSelected = nil
+	ConfirmUI.Visible = false
+end)
+
 for i,v in pairs(Farms:GetChildren()) do
 	if v:IsA('TextButton') then
 		v.Frame.ImageButton.MouseButton1Click:connect(function()
-			Sounds.Click:Play()
-			for _,GUI in pairs(Farms:GetChildren()) do
-				if GUI:IsA('TextButton') then
-					GUI.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
-					if GUI.Name ~= v.Name then
-						Farmings[GUI.Name] = false
-					end
-				end
+			if CurrentSelected ~= nil and CurrentSelected ~= v.Name then
+				Farmings[CurrentSelected] = false
+				CurrentSelected = nil
+				wait(.5)
 			end
+			
+			if not ConfirmUI.Visible and not Farmings[CurrentSelected] and CurrentSelected == nil then
+				Sounds.Click:Play()
+				CurrentSelected = v.Name
+				ConfirmUI.Visible = true
+			elseif Farmings[CurrentSelected] then
+				Farmings[CurrentSelected] = false
+				CurrentSelected = nil
+				FixUI()
+			end
+		end)
+	end
+end
 
-			Farmings[v.Name] = (not Farmings[v.Name])
-
-			if not Farmings[v.Name] then
-				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
-			else
+for i,v in pairs(ElementSelectionUI:GetChildren()) do
+	if v:IsA('TextButton') then
+		v.Frame.ImageButton.MouseButton1Click:connect(function()
+			if not ActiveElements[v.Name] then
+				ActiveElements[v.Name] = true
 				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			else
+				ActiveElements[v.Name] = nil
+				v.Frame.ImageButton.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
 			end
-
-			FarmingFunctions()
 		end)
 	end
 end
@@ -506,11 +602,11 @@ game:GetService('UserInputService').InputBegan:connect(function(Input)
 	elseif Input.KeyCode == Enum.KeyCode.Delete then
 		ClearESPs()
 		ESPActive = false
-		
+
 		for i,v in pairs(Farmings) do
 			Farmings[i] = false
 		end
-		
+
 		UI:Destroy()
 		script:Destroy()
 	end
