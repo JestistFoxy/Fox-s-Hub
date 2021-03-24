@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v22")
+warn("[Fox's Hub] Loading Hack v23")
 
 local Players = game.Players
 
@@ -97,9 +97,9 @@ function UpdateLogs(Element, Rarity)
 	
 	local Date, Hour = os.date('%x', Time), os.date('%X', Time)
 	
-	if not Logged[Element] then Logged[Element] = 0 end
+	if not Logged[Element] then Logged[Element] = {} end
 	
-	Logged[Element] = Logged[Element] +  1
+	table.insert(Logged[Element], #Logged[Element]+1, {['Date'] = Date; ['Hour'] = Hour})
 	
 	local NewUI = UI.LogLayout.LogLayout:Clone()
 	
@@ -118,8 +118,10 @@ function UpdateLogs(Element, Rarity)
 		local HighestNumber = {-40}
 		
 		for i,v in pairs(LogUI:GetChildren()) do
-			if v.LayoutOrder > HighestNumber[1] then
-				HighestNumber = {v.LayoutOrder, v}
+			if v:IsA('TextButton') then
+				if v.LayoutOrder > HighestNumber[1] then
+					HighestNumber = {v.LayoutOrder, v}
+				end
 			end
 		end
 		
