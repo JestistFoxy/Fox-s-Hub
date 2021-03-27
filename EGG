@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v24")
+warn("[Fox's Hub] Loading Hack v25")
 
 local Players = game.Players
 
@@ -117,7 +117,10 @@ function UpdateLogs(Element, Rarity)
 	NewUI.LayoutOrder = -(#LogUI:GetChildren())
 	NewUI.Parent = LogUI
 	
-	NewUI.Visible = (SearchTerm == '' or string.lower(Element):find(SearchTerm))
+	local FindName = (string.lower(Element):find(SearchTerm))
+	local FindRarity = (string.lower(Rarity):find(SearchTerm))
+
+	NewUI.Visible = (SearchTerm == '' or FindName or FindRarity)
 end
 
 LogUI.UIListLayout.Changed:connect(function()
@@ -137,7 +140,20 @@ LogUI.Parent.Search.Changed:connect(function()
 	
 	for i,v in pairs(LogUI:GetChildren()) do
 		if v:IsA('TextButton') then
-			v.Visible = (SearchTerm == '' or string.lower(v.Name):find(SearchTerm))
+			local Rarity
+			
+			for _, AbilityInfo in pairs(AbilityRarities) do
+				if AbilityInfo[1] == v.Name then
+					Rarity = AbilityInfo[3]
+
+					break
+				end
+			end
+			
+			local FindName = (string.lower(v.Name):find(SearchTerm))
+			local FindRarity = (string.lower(Rarity):find(SearchTerm))
+			
+			v.Visible = (SearchTerm == '' or FindName or FindRarity)
 		end
 	end
 end)
