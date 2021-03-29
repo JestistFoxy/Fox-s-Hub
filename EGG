@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v25")
+warn("[Fox's Hub] Loading Hack v26")
 
 local Players = game.Players
 
@@ -117,8 +117,8 @@ function UpdateLogs(Element, Rarity)
 	NewUI.LayoutOrder = -(#LogUI:GetChildren())
 	NewUI.Parent = LogUI
 	
-	local FindName = (string.lower(Element):find(SearchTerm))
-	local FindRarity = (string.lower(Rarity):find(SearchTerm))
+	local FindName = (string.lower(Element):find(string.lower(SearchTerm)))
+	local FindRarity = (string.lower(Rarity):find(string.lower(SearchTerm)))
 
 	NewUI.Visible = (SearchTerm == '' or FindName or FindRarity)
 end
@@ -315,8 +315,11 @@ end
 
 function Attack()
 	for i,v in pairs(Player.Backpack:GetChildren()) do
-		PlayerFolder.StartMove:FireServer(v.Name)
-		PlayerFolder.EndMove:FireServer(v.Name)
+		print(v.Name:sub(#v.Name, #v.Name) ~= ')')
+		if v.Name:sub(#v.Name, #v.Name) ~= ')' then
+			PlayerFolder.StartMove:FireServer(v.Name)
+			PlayerFolder.EndMove:FireServer(v.Name)
+		end
 	end
 end
 
@@ -362,8 +365,10 @@ function FarmSpins()
 					end
 
 					Humanoid:UnequipTools()
-
-					Attack()
+					
+					if Humanoid.Health > 0 then
+						Attack()
+					end
 
 					if Level >= 2 and Farmings.Spins then
 						local AbilityName, AbilityRarity = GetNewAbility()
@@ -396,7 +401,9 @@ function FarmLevels()
 
 				Humanoid:UnequipTools()
 
-				Attack()
+				if Humanoid.Health > 0 then
+					Attack()
+				end
 			end
 		end
 	end
@@ -456,40 +463,46 @@ AddESP.Event:connect(function(Character)
 			repeat
 				if not PlayerElement then
 					PlayerElement = GetOthersElement(InPerson, Backpack)
+					
+					if not game.Players:FindFirstChild(Character.Name) then
+						break
+					end
 					wait()
 				end
 			until PlayerElement
+			
+			if game.Players:FindFirstChild(Character.Name) then
+				local LevelBoard = Head:FindFirstChild('LevelBoard')
 
-			local LevelBoard = Head:FindFirstChild('LevelBoard')
+				if LevelBoard then
+					Level = tonumber(LevelBoard.Frame.TextLabel.Text)
 
-			if LevelBoard then
-				Level = tonumber(LevelBoard.Frame.TextLabel.Text)
+					local LevelBoardChanged = LevelBoard.Frame.TextLabel.Changed:connect(function()
+						if LevelBoard.Parent ~= nil then
+							Level = tonumber(LevelBoard.Frame.TextLabel.Text)
 
-				local LevelBoardChanged = LevelBoard.Frame.TextLabel.Changed:connect(function()
-					if LevelBoard.Parent ~= nil then
-						Level = tonumber(LevelBoard.Frame.TextLabel.Text)
+							if PlayerElement then
+								Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
 
-						if PlayerElement then
-							Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
-
-							if NewESP:FindFirstChild('TextLabel') then
-								NewESP.TextLabel.Text = Text
+								if NewESP:FindFirstChild('TextLabel') then
+									NewESP.TextLabel.Text = Text
+								end
 							end
 						end
-					end
-				end)
+					end)
 
-				table.insert(Connections[Character.Name], LevelBoardChanged)
-			end
+					table.insert(Connections[Character.Name], LevelBoardChanged)
+				end
 
-			if PlayerElement then
-				Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
-			end
+				if PlayerElement then
+					Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
+				end
 
-			if NewESP:FindFirstChild('TextLabel') then
-				NewESP.TextLabel.Text = Text
+				if NewESP:FindFirstChild('TextLabel') then
+					NewESP.TextLabel.Text = Text
 
-				NewESP.Enabled = true
+					NewESP.Enabled = true
+				end
 			end
 		end
 	end
