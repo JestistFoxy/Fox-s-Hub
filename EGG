@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v27")
+warn("[Fox's Hub] Loading Hack v28")
 
 local Players = game.Players
 
@@ -287,6 +287,7 @@ function FarmAbility()
 					FarmingFunctions()
 					break
 				elseif GetSpins:InvokeServer() == 0 then
+					CurrentSelected = 'Spins'
 					Farmings.Ability = false
 					Farmings.Spins = true
 					FixUI()
@@ -372,7 +373,7 @@ function FarmSpins()
 
 					if Level >= 2 and Farmings.Spins then
 						local AbilityName, AbilityRarity = GetNewAbility()
-						Humanoid.Health = 0
+						Humanoid:TakeDamage(Humanoid.Health)
 						Level = 0
 						
 						if Check(AbilityName, AbilityRarity) then
