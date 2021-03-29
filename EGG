@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v29")
+warn("[Fox's Hub] Loading Hack v30")
 
 local Players = game.Players
 
@@ -29,9 +29,11 @@ end
 
 UI.ResetOnSpawn = false
 
-if syn then
-	syn.protect_gui(UI)
-end
+pcall(function()
+	if syn then
+		syn.protect_gui(UI)
+	end
+end)
 
 UI.Parent = game:GetService('CoreGui')
 
