@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v26")
+warn("[Fox's Hub] Loading Hack v27")
 
 local Players = game.Players
 
@@ -464,14 +464,14 @@ AddESP.Event:connect(function(Character)
 				if not PlayerElement then
 					PlayerElement = GetOthersElement(InPerson, Backpack)
 					
-					if not game.Players:FindFirstChild(Character.Name) then
+					if not game.Players:FindFirstChild(Character.Name) or not ESPActive then
 						break
 					end
 					wait()
 				end
 			until PlayerElement
 			
-			if game.Players:FindFirstChild(Character.Name) then
+			if game.Players:FindFirstChild(Character.Name) and ESPActive then
 				local LevelBoard = Head:FindFirstChild('LevelBoard')
 
 				if LevelBoard then
