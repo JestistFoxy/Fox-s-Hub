@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v28")
+warn("[Fox's Hub] Loading Hack v29")
 
 local Players = game.Players
 
@@ -314,10 +314,14 @@ function FarmAbility()
 	end
 end
 
+local AttacksCooldown = {}
+
 function Attack()
 	for i,v in pairs(Player.Backpack:GetChildren()) do
-		print(v.Name:sub(#v.Name, #v.Name) ~= ')')
-		if v.Name:sub(#v.Name, #v.Name) ~= ')' then
+		if not AttacksCooldown[v.Name] then AttacksCooldown[v.Name] = tick() - 2 end
+		
+		if v.Name:sub(#v.Name, #v.Name) ~= ')' and tick() - AttacksCooldown[v.Name] >= 1 then
+			AttacksCooldown[v.Name] = tick()
 			PlayerFolder.StartMove:FireServer(v.Name)
 			PlayerFolder.EndMove:FireServer(v.Name)
 		end
@@ -373,7 +377,7 @@ function FarmSpins()
 
 					if Level >= 2 and Farmings.Spins then
 						local AbilityName, AbilityRarity = GetNewAbility()
-						Humanoid:TakeDamage(Humanoid.Health)
+						Humanoid.Health = 0
 						Level = 0
 						
 						if Check(AbilityName, AbilityRarity) then
