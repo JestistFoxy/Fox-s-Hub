@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v30")
+warn("[Fox's Hub] Loading Hack v31")
 
 local Players = game.Players
 
@@ -11,6 +11,7 @@ local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local VirtualUser = game:GetService('VirtualUser')
 
 local PlayerFolder = ReplicatedStorage:FindFirstChild(Player.UserId..'Client')
+local ServerToClientEvents = ReplicatedStorage.PowerEvents.ServerToClient
 
 local ClientEvents = ReplicatedStorage.Client
 
@@ -37,6 +38,8 @@ end)
 
 UI.Parent = game:GetService('CoreGui')
 
+local Mouse = Player:GetMouse()
+
 local Sounds = UI:FindFirstChild('Sounds')
 
 local Selection = UI.Frame.Frame.Frame
@@ -46,6 +49,10 @@ local ElementSelectionUI = UI.Frame.Frame.ElementSelector.Frame.ScrollingFrame
 
 local Rarities = Selection.Rarities
 local Farms = Selection.FarmingType
+local TargetUI = UI.Frame.ESP.Frame.Target
+local TargetNameUI = TargetUI.Target
+local ToggleTargeting = TargetUI.Targeting.Frame.ImageButton
+local ToggleSilentAim = TargetUI.SilentAIm.Frame.ImageButton
 local ToggleESP = UI.Frame.ESP.Frame.Label.TextLabel.Activate
 local LogUI = UI.Frame.Logs.ScrollingFrame
 
@@ -61,6 +68,8 @@ local ESPLayout = ESPs:WaitForChild('Layout')
 local AddESP = Instance.new("BindableEvent")
 
 local ESPActive = false
+local TargetActive = false
+local SilentAimActive = false
 
 local CurrentSelected
 
@@ -497,7 +506,23 @@ AddESP.Event:connect(function(Character)
 							end
 						end
 					end)
+					
+					local Humanoid = Character:FindFirstChild('Humanoid')
+					if Humanoid then
+						local function UpdateHealth()
+							local MaxHealth = Humanoid.MaxHealth
+							local CurrentHealth = Humanoid.Health
+							local XScale = CurrentHealth/MaxHealth
 
+							NewESP.Health.Amount.Size = UDim2.new(XScale, 0, 1, 0)
+						end
+						
+						local HealthChanged = Humanoid.HealthChanged:connect(UpdateHealth)
+						
+						UpdateHealth()
+						
+						table.insert(Connections[Character.Name] ,HealthChanged)
+					end
 					table.insert(Connections[Character.Name], LevelBoardChanged)
 				end
 
@@ -690,11 +715,78 @@ ToggleESP.MouseButton1Click:connect(function()
 	end
 end)
 
+ToggleTargeting.MouseButton1Click:connect(function()
+	Sounds.Click:Play()
+
+	TargetActive = (not TargetActive)
+	
+	if TargetActive then
+		ToggleTargeting.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	else
+		ToggleTargeting.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+	end
+end)
+
+ToggleSilentAim.MouseButton1Click:connect(function()
+	Sounds.Click:Play()
+
+	SilentAimActive = (not SilentAimActive)
+	
+	if SilentAimActive then
+		ToggleSilentAim.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	else
+		ToggleSilentAim.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+	end
+end)
+
 NewAbilityButton.MouseButton1Click:connect(function()
 	Sounds.Click:Play()
 
 	GetNewAbility()
 end)
+
+ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
+	local Target = TargetNameUI.Text
+	local TargetCharacter = game.Players:FindFirstChild(Target)
+
+	if TargetCharacter and TargetActive then
+		local Character = TargetCharacter.Character
+		if Character then
+			if GetOthersElement(Character:FindFirstChildWhichIsA('Tool'), TargetCharacter.Backpack) then
+				return Character:GetPrimaryPartCFrame().p
+			end
+		end
+	end
+	
+	if SilentAimActive  then
+		local ClosetPlayer = {100000}
+		
+		for _, CheckPlayer in pairs(game.Players:GetPlayers()) do
+			local Character1 = Player.Character
+			local Character2 = CheckPlayer.Character
+			
+			if Character1 and Character2 and Player ~= CheckPlayer then
+				local Humanoid1 = Character1:FindFirstChildWhichIsA('Humanoid')
+				local Humanoid2 = Character2:FindFirstChildWhichIsA('Humanoid')
+				if Humanoid1 and Humanoid2 then
+					if Humanoid1.Health > 0 and Humanoid2.Health > 0 then
+						local Distance = (Mouse.Hit.p - Character2:GetPrimaryPartCFrame().p).Magnitude
+						
+						if Distance < ClosetPlayer[1] then
+							ClosetPlayer = {Distance, Character2}
+						end
+					end
+				end
+			end
+		end
+		
+		if ClosetPlayer[2] then
+			return ClosetPlayer[2]:GetPrimaryPartCFrame().p
+		end
+	end
+	
+	return Mouse.Hit.p
+end
 
 game:GetService('UserInputService').InputBegan:connect(function(Input)
 	if Input.KeyCode == Enum.KeyCode.RightControl then
