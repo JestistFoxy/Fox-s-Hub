@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v31")
+warn("[Fox's Hub] Loading Hack v32")
 
 local Players = game.Players
 
@@ -746,6 +746,22 @@ NewAbilityButton.MouseButton1Click:connect(function()
 end)
 
 ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
+	local PreventionAbilities = {
+		['Timestep'] = true;
+	}
+	
+	local PlayerCharacter = Player.Character
+	
+	if PlayerCharacter then
+		local Tool = PlayerCharacter:FindFirstChildWhichIsA('Tool')
+		
+		if Tool then
+			if PreventionAbilities[Tool.Name] then
+				return Mouse.Hit.p
+			end
+		end
+	end
+	
 	local Target = TargetNameUI.Text
 	local TargetCharacter = game.Players:FindFirstChild(Target)
 
