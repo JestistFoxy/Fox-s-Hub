@@ -1,4 +1,6 @@
-warn("[Fox's Hub] Loading Hack v32")
+warn("[Fox's Hub] Loading Hack v33")
+
+local Camera = workspace.CurrentCamera
 
 local Players = game.Players
 
@@ -350,7 +352,6 @@ function CheckDied(Humanoid)
 					ClientEvents.Teleport:InvokeServer()
 					IGUI.Enabled = false
 					SGUI.Enabled = true
-					local Camera = workspace.CurrentCamera
 					Camera.CameraType = "Custom"
 					Camera.CameraSubject = Humanoid
 					wait(.5)
@@ -715,29 +716,39 @@ ToggleESP.MouseButton1Click:connect(function()
 	end
 end)
 
-ToggleTargeting.MouseButton1Click:connect(function()
+function ToggleTargetingFunction()
 	Sounds.Click:Play()
 
 	TargetActive = (not TargetActive)
-	
+	SilentAimActive = false
+
+	ToggleSilentAim.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+
 	if TargetActive then
 		ToggleTargeting.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	else
 		ToggleTargeting.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
 	end
-end)
+end
 
-ToggleSilentAim.MouseButton1Click:connect(function()
+function ToggleSilentAimFunction()
 	Sounds.Click:Play()
 
 	SilentAimActive = (not SilentAimActive)
-	
+	TargetActive = false
+
+	ToggleTargeting.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
+
 	if SilentAimActive then
 		ToggleSilentAim.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	else
 		ToggleSilentAim.BackgroundColor3 = Color3.fromRGB(27, 42, 53)
 	end
-end)
+end
+
+ToggleTargeting.MouseButton1Click:connect(ToggleTargetingFunction)
+
+ToggleSilentAim.MouseButton1Click:connect(ToggleSilentAimFunction)
 
 NewAbilityButton.MouseButton1Click:connect(function()
 	Sounds.Click:Play()
@@ -775,7 +786,7 @@ ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
 	end
 	
 	if SilentAimActive  then
-		local ClosetPlayer = {100000}
+		local ClosetPlayer = {1000}
 		
 		for _, CheckPlayer in pairs(game.Players:GetPlayers()) do
 			local Character1 = Player.Character
@@ -786,10 +797,20 @@ ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
 				local Humanoid2 = Character2:FindFirstChildWhichIsA('Humanoid')
 				if Humanoid1 and Humanoid2 then
 					if Humanoid1.Health > 0 and Humanoid2.Health > 0 then
-						local Distance = (Mouse.Hit.p - Character2:GetPrimaryPartCFrame().p).Magnitude
+						local PlayerPositionCFrame = Character2:GetPrimaryPartCFrame()
 						
-						if Distance < ClosetPlayer[1] then
-							ClosetPlayer = {Distance, Character2}
+						local Position, Visible = Camera:WorldToScreenPoint(PlayerPositionCFrame.p)
+						
+						if Visible then
+							local MousePosition, PlayerPosition = Vector2.new(Mouse.X, Mouse.Y), Vector2.new(Position.X, Position.Y)
+							
+							local Distance = (MousePosition - PlayerPosition).Magnitude
+							
+							print(Character2, Distance)
+							
+							if Distance < ClosetPlayer[1] then
+								ClosetPlayer = {Distance, Character2}
+							end
 						end
 					end
 				end
@@ -804,19 +825,35 @@ ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
 	return Mouse.Hit.p
 end
 
-game:GetService('UserInputService').InputBegan:connect(function(Input)
-	if Input.KeyCode == Enum.KeyCode.RightControl then
-		UI.Enabled = (not UI.Enabled)
-	elseif Input.KeyCode == Enum.KeyCode.Delete then
-		ClearESPs()
-		ESPActive = false
+local TextboxToggled = false
 
-		for i,v in pairs(Farmings) do
-			Farmings[i] = false
+UserInputService.TextBoxFocused:connect(function()
+	TextboxToggled = true
+end)
+
+UserInputService.TextBoxFocusReleased:connect(function()
+	TextboxToggled = false
+end)
+
+UserInputService.InputBegan:connect(function(Input)
+	if not TextboxToggled then
+		if Input.KeyCode == Enum.KeyCode.RightControl then
+			UI.Enabled = (not UI.Enabled)
+		elseif Input.KeyCode == Enum.KeyCode.Q then
+			ToggleSilentAimFunction()
+		elseif Input.KeyCode == Enum.KeyCode.E then
+			ToggleTargetingFunction()
+		elseif Input.KeyCode == Enum.KeyCode.Delete then
+			ClearESPs()
+			ESPActive = false
+
+			for i,v in pairs(Farmings) do
+				Farmings[i] = false
+			end
+
+			UI:Destroy()
+			script:Destroy()
 		end
-
-		UI:Destroy()
-		script:Destroy()
 	end
 end)
 
