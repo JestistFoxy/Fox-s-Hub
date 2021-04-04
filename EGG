@@ -806,8 +806,6 @@ ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
 							
 							local Distance = (MousePosition - PlayerPosition).Magnitude
 							
-							print(Character2, Distance)
-							
 							if Distance < ClosetPlayer[1] then
 								ClosetPlayer = {Distance, Character2}
 							end
