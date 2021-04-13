@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v33")
+warn("[Fox's Hub] Loading Hack v34")
 
 local Camera = workspace.CurrentCamera
 
@@ -6,14 +6,16 @@ local Players = game.Players
 
 local Player = Players.LocalPlayer
 
-local PG = Player:FindFirstChild('PlayerGui')
+repeat if not Player then wait() Player = Players.LocalPlayer end until Player
+
+local PG = Player:WaitForChild('PlayerGui')
 
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 local VirtualUser = game:GetService('VirtualUser')
 
-local PlayerFolder = ReplicatedStorage:FindFirstChild(Player.UserId..'Client')
-local ServerToClientEvents = ReplicatedStorage.PowerEvents.ServerToClient
+local PlayerFolder = ReplicatedStorage:WaitForChild(Player.UserId..'Client')
+local ServerToClientEvents = ReplicatedStorage:WaitForChild('PowerEvents').ServerToClient
 
 local ClientEvents = ReplicatedStorage.Client
 
