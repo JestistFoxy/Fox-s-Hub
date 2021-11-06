@@ -111,27 +111,27 @@ local SearchTerm = ''
 
 function UpdateLogs(Element, Rarity)
 	local Time = os.time()
-	
+
 	local Date, Hour = os.date('%x', Time), os.date('%X', Time)
-	
+
 	if not Logged[Element] then Logged[Element] = {} end
-	
+
 	table.insert(Logged[Element], #Logged[Element]+1, {['Date'] = Date; ['Hour'] = Hour})
-	
+
 	local NewUI = UI.LogLayout.LogLayout:Clone()
-	
+
 	NewUI.Text = Element .. ' '.. Date ..' '.. Hour
-	
+
 	if RarityColors[Rarity] then
 		NewUI.TextStrokeColor3 = RarityColors[Rarity]
 		NewUI.TextStrokeTransparency = .5
 	end
-	
+
 	NewUI.Name = Element
-	
+
 	NewUI.LayoutOrder = -(#LogUI:GetChildren())
 	NewUI.Parent = LogUI
-	
+
 	local FindName = (string.lower(Element):find(string.lower(SearchTerm)))
 	local FindRarity = (string.lower(Rarity):find(string.lower(SearchTerm)))
 
@@ -152,11 +152,11 @@ end)
 
 LogUI.Parent.Search.Changed:connect(function()
 	SearchTerm = string.lower(LogUI.Parent.Search.Text)
-	
+
 	for i,v in pairs(LogUI:GetChildren()) do
 		if v:IsA('TextButton') then
 			local Rarity
-			
+
 			for _, AbilityInfo in pairs(AbilityRarities) do
 				if AbilityInfo[1] == v.Name then
 					Rarity = AbilityInfo[3]
@@ -164,10 +164,10 @@ LogUI.Parent.Search.Changed:connect(function()
 					break
 				end
 			end
-			
+
 			local FindName = (string.lower(v.Name):find(SearchTerm))
 			local FindRarity = (string.lower(Rarity):find(SearchTerm))
-			
+
 			v.Visible = (SearchTerm == '' or FindName or FindRarity)
 		end
 	end
@@ -233,7 +233,7 @@ function Check(AbilityName, AbilityRarity)
 		if Sounds then
 			Sounds.Success:Play()
 		end
-		
+
 		return true
 	end
 end
@@ -246,7 +246,7 @@ function GetNewAbility()
 			UpdateSpins()
 			UpdateAbilityUI()
 			UpdateLogs(AbilityInfo[1], AbilityInfo[3])
-			
+
 			return AbilityInfo[1], AbilityInfo[3]
 		end
 	end
@@ -261,7 +261,7 @@ function FarmAbility()
 			break
 		end
 	end
-	
+
 	if not RarityEnabled then
 		for i,v in pairs(ActiveElements) do
 			if v then
@@ -281,7 +281,7 @@ function FarmAbility()
 					break
 				end
 			end
-			
+
 			if not RarityEnabled then
 				for i,v in pairs(ActiveElements) do
 					if v then
@@ -334,7 +334,7 @@ local AttacksCooldown = {}
 function Attack()
 	for i,v in pairs(Player.Backpack:GetChildren()) do
 		if not AttacksCooldown[v.Name] then AttacksCooldown[v.Name] = tick() - 2 end
-		
+
 		if v.Name:sub(#v.Name, #v.Name) ~= ')' and tick() - AttacksCooldown[v.Name] >= 1 then
 			AttacksCooldown[v.Name] = tick()
 			PlayerFolder.StartMove:FireServer(v.Name)
@@ -384,7 +384,7 @@ function FarmSpins()
 					end
 
 					Humanoid:UnequipTools()
-					
+
 					if Humanoid.Health > 0 then
 						Attack()
 					end
@@ -393,7 +393,7 @@ function FarmSpins()
 						local AbilityName, AbilityRarity = GetNewAbility()
 						Humanoid.Health = 0
 						Level = 0
-						
+
 						if Check(AbilityName, AbilityRarity) then
 							CurrentSelected = 'Levels'
 							Farmings.Spins = false
@@ -442,7 +442,7 @@ function GetOthersElement(InPerson, Backpack)
 	for ElementName, ElementAttacks in pairs(Elements) do
 		for _,ElementAttack in pairs(ElementAttacks) do
 			if InPerson then
-				if InPerson.Name == ElementAttack then
+				if InPerson.Name == ElementAttack and ElementAttack:IsA('LocalScript') then
 					return ElementName
 				end
 			end
@@ -482,14 +482,14 @@ AddESP.Event:connect(function(Character)
 			repeat
 				if not PlayerElement then
 					PlayerElement = GetOthersElement(InPerson, Backpack)
-					
+
 					if not game.Players:FindFirstChild(Character.Name) or not ESPActive then
 						break
 					end
 					wait()
 				end
 			until PlayerElement
-			
+
 			if game.Players:FindFirstChild(Character.Name) and ESPActive then
 				local LevelBoard = Head:FindFirstChild('LevelBoard')
 
@@ -501,7 +501,9 @@ AddESP.Event:connect(function(Character)
 							Level = tonumber(LevelBoard.Frame.TextLabel.Text)
 
 							if PlayerElement then
-								Text = Character.Name..' | '.. Level..  ' | '.. PlayerElement
+								local Name = FindPlayer.DisplayName or FindPlayer.Name
+								
+								Text = Name..' | '.. Level..  ' | '.. PlayerElement
 
 								if NewESP:FindFirstChild('TextLabel') then
 									NewESP.TextLabel.Text = Text
@@ -509,7 +511,7 @@ AddESP.Event:connect(function(Character)
 							end
 						end
 					end)
-					
+
 					local Humanoid = Character:FindFirstChild('Humanoid')
 					if Humanoid then
 						local function UpdateHealth()
@@ -519,11 +521,11 @@ AddESP.Event:connect(function(Character)
 
 							NewESP.Health.Amount.Size = UDim2.new(XScale, 0, 1, 0)
 						end
-						
+
 						local HealthChanged = Humanoid.HealthChanged:connect(UpdateHealth)
-						
+
 						UpdateHealth()
-						
+
 						table.insert(Connections[Character.Name] ,HealthChanged)
 					end
 					table.insert(Connections[Character.Name], LevelBoardChanged)
@@ -632,9 +634,9 @@ end
 ConfirmUI.Confirm.TextLabel.ImageButton.MouseButton1Click:connect(function()
 	if CurrentSelected then
 		Farmings[CurrentSelected] = true
-		
+
 		ConfirmUI.Visible = false
-		
+
 		FixUI()
 
 		FarmingFunctions()
@@ -659,7 +661,7 @@ for i,v in pairs(Farms:GetChildren()) do
 				CurrentSelected = nil
 				wait(.5)
 			end
-			
+
 			if not ConfirmUI.Visible and not Farmings[CurrentSelected] and CurrentSelected == nil then
 				Sounds.Click:Play()
 				CurrentSelected = v.Name
@@ -762,19 +764,19 @@ ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
 	local PreventionAbilities = {
 		['Timestep'] = true;
 	}
-	
+
 	local PlayerCharacter = Player.Character
-	
+
 	if PlayerCharacter then
 		local Tool = PlayerCharacter:FindFirstChildWhichIsA('Tool')
-		
+
 		if Tool then
 			if PreventionAbilities[Tool.Name] then
 				return Mouse.Hit.p
 			end
 		end
 	end
-	
+
 	local Target = TargetNameUI.Text
 	local TargetCharacter = game.Players:FindFirstChild(Target)
 
@@ -786,28 +788,28 @@ ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
 			end
 		end
 	end
-	
+
 	if SilentAimActive  then
 		local ClosetPlayer = {1000}
-		
+
 		for _, CheckPlayer in pairs(game.Players:GetPlayers()) do
 			local Character1 = Player.Character
 			local Character2 = CheckPlayer.Character
-			
+
 			if Character1 and Character2 and Player ~= CheckPlayer then
 				local Humanoid1 = Character1:FindFirstChildWhichIsA('Humanoid')
 				local Humanoid2 = Character2:FindFirstChildWhichIsA('Humanoid')
 				if Humanoid1 and Humanoid2 then
 					if Humanoid1.Health > 0 and Humanoid2.Health > 0 then
 						local PlayerPositionCFrame = Character2:GetPrimaryPartCFrame()
-						
+
 						local Position, Visible = Camera:WorldToScreenPoint(PlayerPositionCFrame.p)
-						
+
 						if Visible then
 							local MousePosition, PlayerPosition = Vector2.new(Mouse.X, Mouse.Y), Vector2.new(Position.X, Position.Y)
-							
+
 							local Distance = (MousePosition - PlayerPosition).Magnitude
-							
+
 							if Distance < ClosetPlayer[1] then
 								ClosetPlayer = {Distance, Character2}
 							end
@@ -816,12 +818,12 @@ ServerToClientEvents.GetMousePosition.OnClientInvoke = function()
 				end
 			end
 		end
-		
+
 		if ClosetPlayer[2] then
 			return ClosetPlayer[2]:GetPrimaryPartCFrame().p
 		end
 	end
-	
+
 	return Mouse.Hit.p
 end
 
