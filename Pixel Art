@@ -1,0 +1,72 @@
+local HttpService = game:GetService('HttpService')
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local Players = game:GetService('Players')
+
+local Player = Players.LocalPlayer
+
+local PlayerGui = Player:FindFirstChild("PlayerGui")
+
+local Grid = PlayerGui.MainGui.PaintFrame.GridHolder.Grid
+
+local PublishArtRemote = ReplicatedStorage.Remotes.Save
+
+
+local Data = _G.Data
+
+if Data then
+
+    function toInteger(color)
+    	return math.floor(color.r*255)*256^2+math.floor(color.g*255)*256+math.floor(color.b*255)
+    end
+    
+    function toHex(color)
+    	local int = toInteger(color)
+    	
+    	local current = int
+    	local final = ""
+    	
+    	local hexChar = {
+    		"A", "B", "C", "D", "E", "F"
+    	}
+    	
+    	repeat local remainder = current % 16
+    		local char = tostring(remainder)
+    		
+    		if remainder >= 10 then
+    			char = hexChar[1 + remainder - 10]
+    		end
+    		
+    		current = math.floor(current/16)
+    		final = final..char
+    	until current <= 0
+    	
+    	return "#"..string.reverse(final)
+    end
+    
+    local function Build()
+        local DecodeData = HttpService:JSONDecode(Data).data
+        
+        local Size = 32*32
+        
+        local Table = {}
+        for Number = 0, Size-1 do
+            local CurrentColor = Number*4
+            
+            local Color = Color3.fromRGB(
+                DecodeData[tostring(CurrentColor)],
+                DecodeData[tostring(CurrentColor+1)],
+                DecodeData[tostring(CurrentColor+2)]
+            )
+            
+            local HexColor = string.lower(toHex(Color))
+            
+            local FindUI = Grid:FindFirstChild(Number+1)
+            
+            if FindUI then
+                FindUI.BackgroundColor3 = Color
+            end
+        end
+    end
+    
+    Build()
+end
