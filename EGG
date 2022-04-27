@@ -1,4 +1,4 @@
-warn("[Fox's Hub] Loading Hack v34")
+warn("[Fox's Hub] Loading Hack v35")
 
 local Camera = workspace.CurrentCamera
 
@@ -24,23 +24,7 @@ local GetSpins = ClientEvents.GetSpins
 
 local AbilityRarities = ClientEvents.GetRarities:InvokeServer()
 
-local UI
-
-while not UI and wait() do
-	pcall(function()
-		UI = game:GetObjects("rbxassetid://"..6469772512)[1]
-	end)
-end
-
-UI.ResetOnSpawn = false
-
-pcall(function()
-	if syn then
-		syn.protect_gui(UI)
-	end
-end)
-
-UI.Parent = game:GetService('CoreGui')
+local UI = _G['GameUI']
 
 local Mouse = Player:GetMouse()
 
@@ -116,7 +100,7 @@ function UpdateLogs(Element, Rarity)
 
 	if not Logged[Element] then Logged[Element] = {} end
 
-	table.insert(Logged[Element], #Logged[Element]+1, {['Date'] = Date; ['Hour'] = Hour})
+	table.insert(Logged[Element], {['Date'] = Date; ['Hour'] = Hour})
 
 	local NewUI = UI.LogLayout.LogLayout:Clone()
 
@@ -137,10 +121,6 @@ function UpdateLogs(Element, Rarity)
 
 	NewUI.Visible = (SearchTerm == '' or FindName or FindRarity)
 end
-
-LogUI.UIListLayout.Changed:connect(function()
-	LogUI.CanvasSize = UDim2.fromOffset(0, LogUI.UIListLayout.AbsoluteContentSize.Y)
-end)
 
 LogUI.Parent.Clear.TextLabel.Activate.MouseButton1Click:connect(function()
 	for i,v in pairs(LogUI:GetChildren()) do
@@ -502,7 +482,7 @@ AddESP.Event:connect(function(Character)
 
 							if PlayerElement then
 								local Name = FindPlayer.DisplayName or FindPlayer.Name
-								
+
 								Text = Name..' | '.. Level..  ' | '.. PlayerElement
 
 								if NewESP:FindFirstChild('TextLabel') then
@@ -839,9 +819,7 @@ end)
 
 UserInputService.InputBegan:connect(function(Input)
 	if not TextboxToggled then
-		if Input.KeyCode == Enum.KeyCode.RightControl then
-			UI.Enabled = (not UI.Enabled)
-		elseif Input.KeyCode == Enum.KeyCode.Q then
+		if Input.KeyCode == Enum.KeyCode.Q then
 			ToggleSilentAimFunction()
 		elseif Input.KeyCode == Enum.KeyCode.E then
 			ToggleTargetingFunction()
@@ -857,11 +835,6 @@ UserInputService.InputBegan:connect(function(Input)
 			script:Destroy()
 		end
 	end
-end)
-
-Player.Idled:connect(function()
-	VirtualUser:CaptureController()
-	VirtualUser:ClickButton2(Vector2.new())
 end)
 
 UpdateSpins()
