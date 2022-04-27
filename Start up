@@ -13,6 +13,11 @@ local VirtualUser = game:GetService('VirtualUser')
 
 local Player = Players.LocalPlayer
 
+repeat
+	wait()
+	Player = Players.LocalPlayer
+until Player 
+
 Player.Idled:connect(function()
 	VirtualUser:CaptureController()
 	VirtualUser:ClickButton2(Vector2.new())
@@ -53,7 +58,7 @@ local function SetUpSynapse(GameUI)
 	pcall(function()
 		if syn then
 			syn.protect_gui(GameUI)
-			local FolderExists = isfolder("Fox's Hub") if not FolderExists then local Test = makefolder("Fox's Hub") print(Test) end
+			local FolderExists = isfolder("Fox's Hub") if not FolderExists then local Test = makefolder("Fox's Hub") end
 		end
 	end)
 	
@@ -63,8 +68,6 @@ local function SetUpSynapse(GameUI)
 end
 
 local function SetupUI(GameUI)
-	print(1)
-	
 	local TextboxToggled = false
 	
 	UserInputService.TextBoxFocused:connect(function()
