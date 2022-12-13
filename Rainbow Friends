@@ -1,0 +1,44 @@
+
+local Monsters = workspace:WaitForChild('Monsters')
+
+local fromRGB = Color3.fromRGB
+
+local function ESP(Part, Color)
+    if Part.Name ~= 'Map_C1' then
+    
+        if Part:FindFirstChild('Highlight') then
+             Part:FindFirstChild('Highlight'):Destroy()
+        end
+        
+        local ESP = Instance.new("Highlight", Part)
+        ESP.Adornee = Part
+        ESP.Enabled = true
+        ESP.FillColor = Color
+        ESP.OutlineColor = Color
+    end
+end
+
+local function MonsterAdded(Monster)
+    task.wait(.2)
+    ESP(Monster, fromRGB(255, 69, 69))
+end
+
+local function PartAdded(Part)
+    task.wait(.2)
+    print(Part, Part:FindFirstChild('TouchTrigger'))
+    
+    if Part:FindFirstChild('TouchTrigger', true) then
+        ESP(Part, fromRGB(179, 255, 156))
+    end
+end
+
+Monsters.ChildAdded:connect(MonsterAdded)
+workspace.ChildAdded:connect(PartAdded)
+
+for i,v in pairs(Monsters:GetChildren()) do
+    MonsterAdded(v)
+end
+
+for i,v in pairs(workspace:GetChildren()) do
+    PartAdded(v)
+end
