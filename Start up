@@ -102,6 +102,6 @@ if Scripts[game.PlaceId] then
 		
 		GameUI.Enabled = true
 		
-		warn("Fox's hub loaded game ", game.PlaceId)
+		warn("Fox's hub loaded game ".. game.PlaceId)
 	end
 end
