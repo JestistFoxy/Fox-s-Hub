@@ -103,5 +103,7 @@ if Scripts[game.PlaceId] then
 		GameUI.Enabled = true
 		
 		warn("Fox's hub loaded game ".. game.PlaceId)
+	else
+	    loadstring(game:HttpGet(Scripts[game.PlaceId]))();
 	end
 end
