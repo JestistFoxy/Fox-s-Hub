@@ -101,5 +101,7 @@ if Scripts[game.PlaceId] then
 		wait(1)
 		
 		GameUI.Enabled = true
+		
+		warn("Fox's hub loaded game ", game.PlaceId)
 	end
 end
