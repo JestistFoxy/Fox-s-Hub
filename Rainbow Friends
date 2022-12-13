@@ -24,9 +24,7 @@ local function MonsterAdded(Monster)
 end
 
 local function PartAdded(Part)
-    task.wait(.2)
-    print(Part, Part:FindFirstChild('TouchTrigger'))
-    
+    task.wait(.2)    
     if Part:FindFirstChild('TouchTrigger', true) then
         ESP(Part, fromRGB(179, 255, 156))
     end
